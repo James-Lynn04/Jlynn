@@ -74,6 +74,7 @@
       const home = side('home'), away = side('away');
       const b = (c.broadcasts || [])[0];
       return {
+        odds: parseOdds((c.odds || [])[0], home.abbr, away.abbr),
         start: new Date(e.date), home, away,
         network: b && b.names ? b.names[0] : '',
         state: c.status.type.state, detail: c.status.type.shortDetail,
@@ -82,6 +83,34 @@
       };
     });
     return { games, week: data.week ? data.week.number : null };
+  }
+
+  // Favorite and moneylines from ESPN's odds block. ESPN has used two shapes; read either.
+  function parseOdds(o, homeAbbr, awayAbbr) {
+    if (!o) return null;
+    const ml = (side) => {
+      const t = o[side + 'TeamOdds'];
+      if (t && t.moneyLine !== undefined && t.moneyLine !== null) return Number(t.moneyLine);
+      const m = o.moneyline && o.moneyline[side];
+      const v = m && ((m.close && m.close.odds) || (m.current && m.current.odds) || (m.open && m.open.odds));
+      return v !== undefined && v !== null && v !== 'OFF' ? Number(v) : null;
+    };
+    const home = ml('home'), away = ml('away');
+    let fav = null;
+    if (o.homeTeamOdds && o.homeTeamOdds.favorite) fav = homeAbbr;
+    else if (o.awayTeamOdds && o.awayTeamOdds.favorite) fav = awayAbbr;
+    else if (home !== null && away !== null) fav = home < away ? homeAbbr : awayAbbr;
+    else if (o.details) fav = o.details.split(' ')[0];
+    return { fav, home, away, details: o.details || '', total: o.overUnder || null };
+  }
+
+  const money = (n) => (n === null || isNaN(n) ? '' : (n > 0 ? '+' : '') + n);
+
+  function oddsCell(x) {
+    const o = x.odds;
+    if (!o || !o.fav) return '';
+    const n = o.fav === x.home.abbr ? o.home : o.away;
+    return esc(o.fav) + (n !== null ? ' <b>' + esc(money(n)) + '</b>' : '');
   }
 
   function kickoff(d) {
@@ -99,10 +128,20 @@
     if (!g) {
       $('gTitle').textContent = cfg.gameday.teamName;
       $('gMeta').textContent = gd.games.length ? 'No game today' : 'Loading the schedule';
+      $('gOdds').textContent = '';
     } else {
       const me = g.home.abbr === team ? g.home : g.away;
       const them = g.home.abbr === team ? g.away : g.home;
       $('gTitle').textContent = me.name + (g.home.abbr === team ? ' vs ' : ' at ') + them.name;
+      const o = g.odds;
+      if (o && o.fav) {
+        const favName = o.fav === g.home.abbr ? g.home.name : g.away.name;
+        const parts = [favName + ' favored'];
+        if (o.home !== null && o.away !== null) parts.push(g.away.abbr + ' ' + money(o.away), g.home.abbr + ' ' + money(o.home));
+        if (o.details) parts.push(o.details);
+        if (o.total) parts.push('O/U ' + o.total);
+        $('gOdds').innerHTML = parts.map(esc).join('<i></i>');
+      } else $('gOdds').textContent = '';
       if (g.state === 'pre') $('gMeta').innerHTML = esc(kickoff(g.start)) + '<i></i>' + esc(g.network) + '<i></i>' + esc(g.venue);
       else $('gMeta').innerHTML = '<b>' + esc(me.abbr + ' ' + me.score + '  ' + them.abbr + ' ' + them.score) + '</b><i></i>' + esc(g.detail) + '<i></i>' + esc(g.network);
     }
@@ -110,11 +149,12 @@
       const right = x.state === 'pre' ? esc(x.network) : esc(x.away.score + ' - ' + x.home.score);
       const left = x.state === 'pre' ? esc(kickoff(x.start)) : (x.state === 'in' ? '<b>Live</b>' : 'Final');
       return '<li class="g' + (x.mine ? ' mine' : '') + (x.state === 'in' ? ' live' : '') + '"><span class="t">' + left +
-        '</span><span class="m">' + esc(x.away.abbr) + ' <i>at</i> ' + esc(x.home.abbr) + '</span><span class="n">' + right + '</span></li>';
+        '</span><span class="m">' + esc(x.away.abbr) + ' <i>at</i> ' + esc(x.home.abbr) + '</span><span class="o">' + (x.state === 'post' ? '' : oddsCell(x)) + '</span><span class="n">' + right + '</span></li>';
     });
     const first = gd.games[0];
     $('slateTitle').textContent = first ? first.start.toLocaleDateString('en-US', { weekday: 'long' }) + "'s games" : "Today's games";
-    $('gList').innerHTML = rows.join('') || '<li class="g empty">Schedule loads when the TV is online</li>';
+    const head = rows.length ? '<li class="g head"><span class="t">Kickoff</span><span class="m">Game</span><span class="o">Favorite</span><span class="n">TV</span></li>' : '';
+    $('gList').innerHTML = head + rows.join('') || '<li class="g empty">Schedule loads when the TV is online</li>';
   }
 
   // The gameday intro plays once each time the homescreen opens. Any button skips it.

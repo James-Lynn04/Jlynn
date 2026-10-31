@@ -131,6 +131,9 @@ body.gameday .game { display: block; position: fixed; left: 9vh; top: 17vh; widt
 .g-title { margin-top: 1.2vh; font-size: 9vh; line-height: 1; font-weight: 600; font-stretch: 78%; letter-spacing: -0.015em; font-variation-settings: "opsz" 96, "wdth" 78, "wght" 600; }
 .g-meta { margin-top: 2vh; font-size: 2.8vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .g-meta b { color: var(--ink); font-weight: 600; }
+.g-odds { margin-top: 1.2vh; font-size: 2.3vh; color: var(--silver); font-variant-numeric: tabular-nums; }
+.g-odds i { display: inline-block; width: 0.6vh; height: 0.6vh; margin: 0 1.4vh 0.45vh; border-radius: 50%; background: rgba(255, 255, 255, 0.3); }
+.g-meta i, .g-odds i { vertical-align: middle; }
 .g-meta i { display: inline-block; width: 0.7vh; height: 0.7vh; margin: 0 1.6vh 0.5vh; border-radius: 50%; background: var(--silver); }
 body.gameday .viewport { top: 42vh; }
 body.gameday .big { font-stretch: 85%; letter-spacing: -0.01em; }
@@ -142,15 +145,21 @@ body.gameday .slate { display: block; position: fixed; right: 9vh; top: 17vh; bo
 .slate-list { list-style: none; }
 .g { display: flex; align-items: center; height: 5.4vh; padding: 0 2vh; border-radius: 1vh; font-size: 2.5vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .g + .g { border-top: 1px solid rgba(255, 255, 255, 0.07); }
-.g .t { width: 14vh; color: var(--ink-faint); }
+.g .t { width: 13vh; color: var(--ink-faint); }
 .g .t b { color: #ffffff; font-weight: 600; }
 .g .m { flex: 1; font-weight: 500; color: var(--ink); letter-spacing: 0.02em; }
 .g .m i { font-style: normal; color: var(--ink-faint); margin: 0 0.6vh; font-weight: 400; }
-.g .n { color: var(--ink-faint); }
+.g .o { width: 13vh; color: var(--ink-faint); white-space: nowrap; }
+.g .o b { color: var(--ink-2); font-weight: 500; }
+.g.mine .o, .g.mine .o b { color: var(--ink); }
+.g .n { width: 7vh; text-align: right; color: var(--ink-faint); }
 .g.mine { background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)); border-top-color: transparent; }
 .g.mine + .g { border-top-color: transparent; }
 .g.mine .t, .g.mine .n { color: var(--ink); }
 .g.empty { color: var(--ink-faint); }
+.g.head { height: 3.6vh; font-size: 1.7vh; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+.g.head span { color: var(--ink-faint); font-weight: 600; }
+.g.head + .g { border-top: 0; }
 body.gameday .sheet { background: rgba(4, 30, 66, 0.92); }
 
 /* Gameday intro video, full screen over everything. */
