@@ -1,0 +1,7 @@
+backup/
+build/
+android/.gradle/
+android/app/build/
+android/local.properties
+*.wgt
+.DS_Store

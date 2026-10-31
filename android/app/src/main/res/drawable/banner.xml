@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 320x180 TV banner: a thin clock arc on near-black. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#08090C" android:pathData="M0,0h320v180h-320z" />
+    <path android:strokeColor="#F4F2EE" android:strokeWidth="3" android:strokeLineCap="round"
+        android:pathData="M160,60m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0M160,44v16l11,8" />
+    <path android:strokeColor="#66F4F2EE" android:strokeWidth="2" android:strokeLineCap="round"
+        android:pathData="M124,130h72" />
+</vector>
