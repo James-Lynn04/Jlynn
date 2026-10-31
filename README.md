@@ -50,7 +50,7 @@ Preview on a laptop: open `web/index.html` in Chrome. Up and Down move, Enter op
 |---|---|---|
 | Replaces the Home button | Yes | No. Samsung locks Smart Hub. It installs as an app; pin it first in the Apps row. |
 | Removes the ad rows | Yes, by disabling the stock home (reversible) | No |
-| Chromecast tile | Opens a Chromecast HDMI input if one exists, else shows how to cast to the TV's built-in Chromecast | Shows the Chromecast HDMI input full screen (depends on the model allowing it). Otherwise opens the input list. Back returns home. |
+| Chromecast line | Opens a Chromecast HDMI input if one exists, else shows how to cast to the TV's built-in Chromecast | Shows the Chromecast HDMI input full screen (depends on the model allowing it). Otherwise opens the input list. Back returns home. |
 | Settings button | Opens system settings | Hidden. Samsung blocks it. Use the remote. |
 | Supported models | Android 7+ | 2019 or newer |
 
@@ -64,7 +64,7 @@ Edit `web/config.js`, then run the install script again. Android package names f
 | Apple TV | `com.apple.atve.androidtv.appletv` |
 | Plex | `com.plexapp.android` |
 
-Name your Chromecast's HDMI input "Chromecast" in the TV's input settings and the tile finds it.
+Name your Chromecast's HDMI input "Chromecast" in the TV's input settings and the Chromecast line finds it.
 
 ## Credits
 
