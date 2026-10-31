@@ -14,8 +14,8 @@ window.HOME_CONFIG = {
     { key: 'prime', name: 'Prime Video', android: ['com.amazon.amazonvideo.livingroom', 'com.amazon.avod.thirdpartyclient'], tizen: /prime video|amazon/i },
     { key: 'spotify', name: 'Spotify', android: ['com.spotify.tv.android', 'com.spotify.music'], tizen: /spotify/i },
     // Opens the input whose name matches `input` (a Chromecast on HDMI).
-    // If none matches: TCL shows how to cast to its built-in Chromecast, Samsung opens the input list.
-    { key: 'cast', name: 'Chromecast', type: 'cast', input: /chromecast/i },
+    // If none matches: TCL shows how to cast to its built-in Chromecast. Samsung asks once for the HDMI port and remembers it.
+    { key: 'cast', name: 'Chromecast', type: 'cast', input: /chromecast/i, device: 'Chromecast' },
     { key: 'xbox', name: 'Xbox', type: 'input', device: 'Xbox', tvs: ['tizen'] }
   ],
 

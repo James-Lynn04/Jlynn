@@ -277,7 +277,8 @@
       const app = matchDock(item, apps);
       if (app) used[app.id] = true;
       let sub = '';
-      if (item.type === 'cast') sub = 'Cast from your phone';
+      if (item.type === 'cast' && host.kind === 'tizen') sub = savedPort(item) ? savedPort(item).name + '. Right to change' : 'Pick its HDMI port';
+      else if (item.type === 'cast') sub = 'Cast from your phone';
       else if (item.type === 'input') sub = savedPort(item) ? savedPort(item).name + '. Right to change' : 'Pick its HDMI port';
       else if (!app) sub = 'Not installed';
       let name = item.name;
@@ -360,7 +361,8 @@
     host.inputs().then((list) => {
       const hit = list.find((i) => item.input.test(i.name));
       if (hit) return host.openInput(hit);
-      if (host.kind === 'tizen') return showInputs();
+      // Samsung doesn't report input names, so ask once which port the Chromecast is on and remember it.
+      if (host.kind === 'tizen') return openPort(item);
       showSheet('Ready to cast',
         'On your phone, open Netflix, YouTube, Disney+ or Spotify. Tap the <b>Cast</b> icon and pick <b>' +
         esc(host.deviceName()) + '</b>. Phone and TV need the same Wi-Fi.', []);
@@ -434,7 +436,8 @@
       }
       if (key === KEY.DOWN) state.i = Math.min(state.items.length - 1, state.i + 1);
       const it = state.items[state.i];
-      if (key === KEY.RIGHT && it && it.item && it.item.type === 'input') return pickPort(it.item, false);
+      const portLine = it && it.item && (it.item.type === 'input' || (it.item.type === 'cast' && host.kind === 'tizen'));
+      if (key === KEY.RIGHT && portLine) return pickPort(it.item, false);
     } else if (z === 'top') {
       const n = topButtons().length;
       if (key === KEY.LEFT) state.top = Math.max(0, state.top - 1);
