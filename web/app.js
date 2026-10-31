@@ -1,6 +1,7 @@
 (function () {
   const cfg = window.HOME_CONFIG;
   const host = pickHost();
+  const TV_ROOT = () => document.body;
   const $ = (id) => document.getElementById(id);
   const KEY = { LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40, ENTER: 13 };
   const BACK_KEYS = [10009, 27, 8, 461]; // Samsung, Esc, Backspace, LG
@@ -16,27 +17,70 @@
     set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   };
 
-  // ---------- Clock ----------
-  function partOfDay(h) {
-    if (h >= 5 && h < 11) return 'morning';
-    if (h >= 11 && h < 17) return 'day';
-    if (h >= 17 && h < 22) return 'evening';
-    return 'night';
+  // ---------- Clock and light ----------
+  // Sunrise and sunset in local minutes after midnight (NOAA approximation).
+  function sunTimes(d, lat, lon) {
+    const rad = Math.PI / 180;
+    const day = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(d.getFullYear(), 0, 0)) / 864e5);
+    const g = 2 * Math.PI / 365 * (day - 1);
+    const eq = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g) - 0.014615 * Math.cos(2 * g) - 0.040849 * Math.sin(2 * g));
+    const decl = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g) - 0.006758 * Math.cos(2 * g) +
+      0.000907 * Math.sin(2 * g) - 0.002697 * Math.cos(3 * g) + 0.00148 * Math.sin(3 * g);
+    const cosHa = Math.cos(90.833 * rad) / (Math.cos(lat * rad) * Math.cos(decl)) - Math.tan(lat * rad) * Math.tan(decl);
+    const ha = Math.acos(Math.max(-1, Math.min(1, cosHa))) / rad;
+    const off = d.getTimezoneOffset();
+    return { rise: 720 - 4 * (lon + ha) - eq - off, set: 720 - 4 * (lon - ha) - eq - off };
   }
+
+  function fmt(mins) {
+    let h = Math.floor(mins / 60) % 24;
+    const m = String(Math.floor(mins % 60)).padStart(2, '0');
+    if (!cfg.clock12h) return h + ':' + m;
+    const ap = h < 12 ? ' AM' : ' PM';
+    return (h % 12 || 12) + ':' + m + ap;
+  }
+
+  // Daylight crosses the wall from left (sunrise) to right (sunset), high at noon and warm at the ends.
+  // After dark a low lamp glows in the corner and the wall dims.
+  const PREVIEW = { morning: 0.12, day: 0.5, evening: 0.94 };
+  function light(now, sun) {
+    const t = now.getHours() * 60 + now.getMinutes();
+    const o = window.TOD_OVERRIDE;
+    let p = o ? PREVIEW[o] : (t - sun.rise) / (sun.set - sun.rise);
+    const css = TV_ROOT().style;
+    if (o === 'night' || (!o && (p < 0 || p > 1))) {
+      css.setProperty('--wall', '#ebe3da');
+      css.setProperty('--lx', '86%'); css.setProperty('--ly', '62%');
+      css.setProperty('--lc', 'rgba(236, 132, 64, 0.42)');
+      return 'night';
+    }
+    const warm = 1 - Math.sin(Math.PI * p);
+    const r = 255, gr = Math.round(232 - 62 * warm), b = Math.round(200 - 100 * warm);
+    css.setProperty('--wall', p > 0.85 ? '#f6f1eb' : '#fbf9f6');
+    css.setProperty('--lx', (10 + 80 * p).toFixed(1) + '%');
+    css.setProperty('--ly', (6 + 40 * warm).toFixed(1) + '%');
+    css.setProperty('--lc', 'rgba(' + r + ',' + gr + ',' + b + ',' + (0.5 + 0.15 * warm).toFixed(2) + ')');
+    return p < 0.35 ? 'morning' : p < 0.8 ? 'day' : 'evening';
+  }
+
   function tick() {
     const d = new Date();
     let h = d.getHours();
-    const m = String(d.getMinutes()).padStart(2, '0');
     if (cfg.clock12h) {
       $('ampm').textContent = h < 12 ? 'AM' : 'PM';
       h = h % 12 || 12;
     }
-    $('clock').textContent = h + ':' + m;
+    $('hh').textContent = h;
+    $('mm').textContent = String(d.getMinutes()).padStart(2, '0');
     $('date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    const tod = partOfDay(d.getHours());
-    document.body.dataset.tod = tod;
-    const word = { morning: 'Good morning', day: 'Good afternoon', evening: 'Good evening', night: 'Good night' }[tod];
-    $('greeting').textContent = cfg.name ? word + ', ' + cfg.name : word;
+
+    const loc = cfg.location;
+    const sun = sunTimes(d, loc.lat, loc.lon);
+    const t = d.getHours() * 60 + d.getMinutes();
+    $('sun').innerHTML = t < sun.rise ? 'Sunrise <b>' + fmt(sun.rise) + '</b> in ' + loc.name
+      : t < sun.set ? 'Sunset <b>' + fmt(sun.set) + '</b> in ' + loc.name
+      : 'Sunrise <b>' + fmt(sun.rise) + '</b> in ' + loc.name;
+    TV_ROOT().dataset.tod = light(d, sun);
   }
 
   // ---------- Apps ----------
@@ -107,7 +151,10 @@
       let sub = '';
       if (d.item.type === 'cast') sub = 'Cast from your phone';
       else if (!d.app) sub = 'Not installed';
-      $('dockLabel').innerHTML = state.zone === 'dock' ? d.item.name + (sub ? '<span class="sub">' + sub + '</span>' : '') : '&nbsp;';
+      const label = $('dockLabel');
+      label.innerHTML = state.zone === 'dock' ? d.item.name + (sub ? '<span class="sub">' + sub + '</span>' : '') : '&nbsp;';
+      const tile = $('dock').children[state.dock];
+      if (tile) label.style.transform = 'translateX(' + (tile.offsetLeft - $('dock').offsetLeft) + 'px)';
     }
     document.body.classList.toggle('drawer-open', state.zone === 'grid' || (state.zone === 'sheet' && state.sheetFrom === 'grid'));
   }

@@ -1,7 +1,7 @@
 // Edit this file to change the homescreen. Both TVs read it.
 window.HOME_CONFIG = {
-  // Shown under the clock. Leave empty for no name.
-  name: '',
+  // Sets the sunrise and sunset times and where the daylight falls on the wall.
+  location: { name: 'Toronto', lat: 43.65, lon: -79.38 },
 
   // true = 9:41 PM, false = 21:41
   clock12h: true,

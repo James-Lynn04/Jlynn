@@ -7,31 +7,33 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="sky" aria-hidden="true"><div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div></div>
+  <!-- The wall, lit by a light that follows the sun. -->
+  <div class="wall" aria-hidden="true"><div class="light"></div></div>
 
-  <main id="home">
-    <header class="top">
-      <section class="time">
-        <div class="clock"><span id="clock">--:--</span><span id="ampm" class="ampm"></span></div>
-        <div id="date" class="date"></div>
-        <div id="greeting" class="greeting"></div>
-      </section>
-      <nav class="actions">
-        <button class="pill" data-zone="top" data-action="inputs">Inputs</button>
-        <button class="pill" data-zone="top" data-action="settings" id="settingsBtn">Settings</button>
-      </nav>
-    </header>
+  <header class="top">
+    <div class="meta">
+      <div id="date" class="date"></div>
+      <div id="sun" class="sun"></div>
+    </div>
+    <nav class="actions">
+      <button class="pill" data-zone="top" data-action="inputs">Inputs</button>
+      <button class="pill" data-zone="top" data-action="settings" id="settingsBtn">Settings</button>
+    </nav>
+  </header>
 
-    <section class="dock-wrap">
+  <!-- The clock stands on the console. -->
+  <div class="clock" aria-live="off"><span id="hh"></span><span class="colon">:</span><span id="mm"></span><span id="ampm" class="ampm"></span></div>
+
+  <!-- The console: a chestnut shelf that holds the apps and rises for All apps. -->
+  <section class="shelf">
+    <div class="shelf-head">
       <div id="dock" class="dock"></div>
-      <div id="dockLabel" class="dock-label">&nbsp;</div>
-      <div class="hint"><span class="chev"></span>All apps</div>
-    </section>
-  </main>
-
-  <section id="drawer" class="drawer" aria-hidden="true">
-    <div class="drawer-title">All apps</div>
-    <div id="grid" class="grid"></div>
+      <div class="hint">All apps<span class="chev"></span></div>
+    </div>
+    <div id="dockLabel" class="dock-label">&nbsp;</div>
+    <div id="drawer" class="drawer">
+      <div id="grid" class="grid"></div>
+    </div>
   </section>
 
   <section id="sheet" class="sheet" aria-hidden="true">

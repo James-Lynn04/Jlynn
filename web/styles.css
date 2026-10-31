@@ -1,127 +1,144 @@
-/* Sized in vh so the layout is identical at 960x540, 1920x1080 and 3840x2160. */
-:root {
-  /* Warm white walls, chestnut wood, orange accents, lamplight. */
-  --bg: #f8f4ef;
-  --fade: rgba(248, 244, 239, 0.85);
-  --ink: #4a2e22;
-  --ink-2: rgba(74, 46, 34, 0.66);
-  --ink-3: rgba(74, 46, 34, 0.42);
-  --card: rgba(255, 255, 255, 0.72);
-  --card-edge: rgba(74, 46, 34, 0.07);
-  --shadow: rgba(110, 62, 34, 0.10);
-  --accent: #e07b39;
-  --on-ink: #fbf7f2;
-  --a: #ffd7b0;
-  --b: #e9b48e;
-  --c: #ffe6c9;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+/* Sized in vh so the layout is identical at 960x540, 1920x1080 and 3840x2160.
+   The room: a white wall lit by daylight or a lamp, a chestnut console below it,
+   the clock standing on the console, the apps on its surface. */
+@font-face {
+  font-family: "Bricolage";
+  src: url("fonts/bricolage.woff2") format("woff2");
+  font-weight: 200 800;
+  font-stretch: 75% 100%;
 }
 
-/* Palette follows the time of day; app.js sets body[data-tod]. */
-/* Morning is bright and peach, evening glows orange, night dims like a lamp turned low. */
-body[data-tod="morning"] { --a: #ffe0bf; --b: #f7cfa6; --c: #fff1e0; }
-body[data-tod="day"]     { --a: #fde6cc; --b: #efd2b8; --c: #fff4e6; }
-body[data-tod="evening"] { --a: #f6b37e; --b: #d99872; --c: #ffd2a6; --bg: #f3ebe2; --fade: rgba(243, 235, 226, 0.85); }
-body[data-tod="night"]   { --a: #e6a06d; --b: #b98063; --c: #efc095; --bg: #e7ddd2; --fade: rgba(231, 221, 210, 0.88); --card: rgba(255, 252, 248, 0.6); }
+:root {
+  --wall: #fbf9f6;
+  --ink: #3b2218;
+  --ink-2: rgba(59, 34, 24, 0.62);
+  --wood: #5a3324;
+  --wood-deep: #43251a;
+  --wood-edge: #8a5638;
+  --cream: #f7ecdf;
+  --cream-2: rgba(247, 236, 223, 0.58);
+  --orange: #ec7330;
+  /* Set by app.js from the sun: where the light falls and what colour it is. */
+  --lx: 70%;
+  --ly: 10%;
+  --lc: rgba(255, 214, 160, 0.55);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --shelf-top: 61vh;
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 body {
-  background: var(--bg);
+  background: var(--wall);
   color: var(--ink);
-  font-family: "SamsungOne", "Google Sans", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Bricolage", "SamsungOne", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-variation-settings: "opsz" 14;
   -webkit-font-smoothing: antialiased;
+  transition: background 3s;
   cursor: none;
 }
 button { font: inherit; color: inherit; background: none; border: 0; outline: none; }
 
-/* Ambient background: large soft gradients drifting slowly. Transform only, cheap on TV GPUs. */
-.sky { position: fixed; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; transition: opacity 0.6s; }
-.glow { position: absolute; width: 120vh; height: 120vh; border-radius: 50%; opacity: 0.9; transition: background 4s; }
-.g1 { left: -30vh; top: -40vh; background: radial-gradient(closest-side, var(--a), transparent); animation: drift1 70s ease-in-out infinite alternate; }
-.g2 { right: -40vh; bottom: -55vh; background: radial-gradient(closest-side, var(--b), transparent); animation: drift2 90s ease-in-out infinite alternate; }
-.g3 { left: 45%; top: 20vh; width: 90vh; height: 90vh; background: radial-gradient(closest-side, var(--c), transparent); opacity: 0.8; animation: drift3 110s ease-in-out infinite alternate; }
-@keyframes drift1 { to { transform: translate(40vh, 18vh) scale(1.15); } }
-@keyframes drift2 { to { transform: translate(-50vh, -20vh) scale(1.1); } }
-@keyframes drift3 { to { transform: translate(-35vh, 15vh) scale(0.85); } }
-.sky::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(180deg, rgba(255,255,255,0) 50%, var(--fade) 100%); }
-
-main { position: fixed; top: 0; right: 0; bottom: 0; left: 0; padding: 8vh 9vh; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.5s var(--ease), opacity 0.5s var(--ease); }
-body.drawer-open main { transform: translateY(-14vh); opacity: 0.35; }
-
-/* Clock */
-.top { display: flex; justify-content: space-between; align-items: flex-start; }
-.clock { font-size: 19vh; font-weight: 200; color: var(--ink); letter-spacing: -0.03em; line-height: 0.9; font-variant-numeric: tabular-nums; }
-.ampm { font-size: 3.2vh; font-weight: 400; letter-spacing: 0.12em; margin-left: 1.6vh; color: var(--accent); vertical-align: 11.5vh; }
-.date { margin-top: 2.6vh; font-size: 2.1vh; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-2); }
-.greeting { margin-top: 1.2vh; font-size: 3.3vh; font-weight: 300; color: var(--ink); }
-
-.actions { display: flex; padding-top: 1vh; }
-.actions .pill + .pill { margin-left: 1.6vh; }
-.pill {
-  height: 5.6vh; padding: 0 2.8vh; border-radius: 2.8vh;
-  font-size: 2vh; letter-spacing: 0.06em; color: var(--ink-2);
-  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 0.6vh 2vh var(--shadow);
-  transition: transform 0.25s var(--ease), background 0.25s, color 0.25s;
+/* Light on the wall */
+.wall { position: fixed; top: 0; right: 0; bottom: 0; left: 0; }
+.light {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: radial-gradient(ellipse 70vh 60vh at var(--lx) var(--ly), var(--lc), rgba(255, 255, 255, 0) 100%);
+  transition: background 3s;
 }
-.pill.focus { background: var(--ink); color: var(--on-ink); transform: scale(1.06); box-shadow: 0 1vh 3vh var(--shadow); }
+
+/* Top line */
+.top { position: fixed; top: 7vh; left: 9vh; right: 9vh; display: flex; justify-content: space-between; align-items: flex-start; }
+.date { font-size: 2.6vh; font-weight: 500; font-variation-settings: "opsz" 24; }
+.sun { margin-top: 0.8vh; font-size: 2.1vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sun b { font-weight: 500; color: var(--orange); }
+
+.actions { display: flex; }
+.pill {
+  position: relative; height: 4.6vh; padding: 0 0.4vh; margin-left: 4vh;
+  font-size: 2.2vh; font-weight: 450; color: var(--ink-2);
+  transition: color 0.25s;
+}
+.pill::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; width: 0.8vh; height: 0.8vh; margin-left: -0.4vh;
+  border-radius: 50%; background: var(--orange); transform: scale(0); transition: transform 0.25s var(--ease);
+}
+.pill.focus { color: var(--ink); }
+.pill.focus::after { transform: scale(1); }
 .pill.off { display: none; }
 
-/* Dock */
-.dock-wrap { display: flex; flex-direction: column; align-items: center; padding-bottom: 1vh; }
+/* The clock, standing on the console */
+.clock {
+  position: fixed; left: 7.4vh; bottom: calc(100vh - var(--shelf-top) - 3.6vh);
+  font-size: 36vh; line-height: 1; font-weight: 200; font-stretch: 80%;
+  font-variation-settings: "opsz" 96, "wght" 200, "wdth" 80; letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: transform 0.6s var(--ease), opacity 0.4s;
+}
+.colon { display: inline-block; color: var(--orange); animation: breathe 4s ease-in-out infinite; margin: 0 0.03em; transform: translateY(-0.06em); }
+@keyframes breathe { 50% { opacity: 0.35; } }
+.ampm { font-size: 3vh; font-weight: 500; font-stretch: 100%; letter-spacing: 0.08em; color: var(--ink-2); margin-left: 2vh; font-variation-settings: "opsz" 24; }
+
+/* The console */
+.shelf {
+  position: fixed; left: 0; right: 0; bottom: 0; top: var(--shelf-top);
+  padding: 6.4vh 9vh 0;
+  background: linear-gradient(180deg, var(--wood) 0%, var(--wood-deep) 100%);
+  box-shadow: inset 0 0.35vh 0 var(--wood-edge), 0 -2vh 6vh rgba(59, 34, 24, 0.10);
+  color: var(--cream);
+  transition: top 0.6s var(--ease);
+}
+.shelf-head { display: flex; justify-content: space-between; align-items: flex-start; }
 .dock { display: flex; }
-.dock .tile + .tile { margin-left: 3vh; }
+.dock .tile + .tile { margin-left: 2.6vh; }
+
 .tile {
-  position: relative; width: 27vh; height: 15.2vh; border-radius: 2.2vh; overflow: hidden;
-  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 0.8vh 2.6vh var(--shadow);
+  position: relative; width: 26vh; height: 14.6vh; border-radius: 1.6vh; overflow: hidden; flex: none;
+  background: rgba(247, 236, 223, 0.07); box-shadow: inset 0 0 0 1px rgba(247, 236, 223, 0.08);
   display: flex; align-items: center; justify-content: center;
-  opacity: 0.9; transform: scale(1); color: var(--ink);
-  transition: transform 0.3s var(--ease), opacity 0.3s, box-shadow 0.3s;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s, background 0.35s;
 }
 .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tile .name { font-size: 2.7vh; font-weight: 400; letter-spacing: 0.02em; }
-.tile.missing { opacity: 0.45; }
+.tile .name { font-size: 2.8vh; font-weight: 500; font-stretch: 88%; color: var(--cream); font-variation-settings: "opsz" 28; }
+.tile.missing { opacity: 0.4; }
+.tile .glyph { width: 6.4vh; height: 6.4vh; color: var(--cream-2); transition: color 0.35s; }
+/* Focus: the tile lifts off the wood and lamplight pools under it. */
 .tile.focus {
-  opacity: 1; transform: scale(1.12);
-  background: #ffffff;
-  box-shadow: 0 0 0 0.35vh var(--accent), 0 2.4vh 5vh rgba(110, 62, 34, 0.22);
+  transform: translateY(-1.4vh) scale(1.05);
+  background: rgba(247, 236, 223, 0.16);
+  box-shadow: inset 0 0 0 0.3vh var(--cream), 0 3.6vh 5vh -1.6vh rgba(236, 115, 48, 0.55);
 }
-.tile .glyph { width: 7vh; height: 7vh; color: var(--ink-2); }
-.tile.focus .glyph { color: var(--accent); }
-.dock-label { margin-top: 4.2vh; height: 3vh; font-size: 2.4vh; letter-spacing: 0.04em; color: var(--ink); transition: opacity 0.3s; }
-.dock-label .sub { color: var(--ink-3); margin-left: 1.2vh; }
-.hint { margin-top: 3.4vh; font-size: 1.6vh; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-3); display: flex; flex-direction: column; align-items: center; }
-.hint .chev { margin-bottom: 1vh; }
-.chev { width: 1.4vh; height: 1.4vh; border-right: 0.2vh solid var(--ink-3); border-bottom: 0.2vh solid var(--ink-3); transform: rotate(45deg); animation: nudge 2.4s ease-in-out infinite; }
-@keyframes nudge { 50% { transform: translate(0, 0.6vh) rotate(45deg); } }
-body.drawer-open .hint, body.drawer-open .dock-wrap { opacity: 0; }
-.dock-wrap { transition: opacity 0.3s; }
+.tile.focus .glyph { color: var(--orange); }
 
-/* All apps drawer */
-.drawer {
-  position: fixed; left: 0; right: 0; bottom: 0; height: 66vh; padding: 5vh 8vh 6vh;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, var(--fade) 14%, var(--bg) 40%);
-  transform: translateY(100%); transition: transform 0.5s var(--ease);
-}
-body.drawer-open .drawer { transform: translateY(0); }
-.drawer-title { font-size: 2vh; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-2); margin: 4vh 0 3.4vh; }
-.grid { display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 3.4vh 3vh; height: 46vh; padding: 1.4vh; margin: -1.4vh; overflow: hidden; align-content: start; }
-.grid .tile { width: 100%; height: 13.8vh; }
-.grid .tile .name { font-size: 2.1vh; padding: 0 1.4vh; text-align: center; }
-.grid .tile.focus { transform: scale(1.08); }
+.dock-label { height: 3vh; margin-top: 2.6vh; font-size: 2.3vh; font-weight: 500; color: var(--cream); white-space: nowrap; transition: transform 0.35s var(--ease); }
+.dock-label .sub { color: var(--cream-2); font-weight: 400; margin-left: 1.4vh; }
 
-/* Sheet: inputs list, cast card */
-.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(74, 46, 34, 0.18); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.hint { display: flex; align-items: center; height: 14.6vh; font-size: 1.9vh; font-weight: 500; color: var(--cream-2); white-space: nowrap; }
+.chev { width: 1.2vh; height: 1.2vh; margin-left: 1.4vh; border-right: 0.22vh solid var(--orange); border-bottom: 0.22vh solid var(--orange); transform: rotate(45deg); animation: nudge 2.4s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translate(0, 0.5vh) rotate(45deg); } }
+
+/* All apps: the console rises and the rest of the apps sit on it. */
+body.drawer-open { --shelf-top: 18vh; }
+body.drawer-open .clock { opacity: 0; transform: translateY(-20vh); }
+body.drawer-open .hint { opacity: 0; }
+.drawer { margin-top: 0.6vh; padding-top: 3.4vh; border-top: 1px solid rgba(247, 236, 223, 0.12); opacity: 0; transition: opacity 0.4s; }
+body.drawer-open .drawer { opacity: 1; }
+.grid { display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 3vh 2.6vh; height: 46vh; padding: 1.6vh 0.6vh; margin: -1.6vh -0.6vh; overflow: hidden; align-content: start; }
+.grid .tile { width: 100%; height: 13.4vh; }
+.grid .tile .name { font-size: 2.2vh; padding: 0 1.4vh; text-align: center; }
+
+/* Sheet: a card on the wall */
+.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(59, 34, 24, 0.28); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 body.sheet-open .sheet { opacity: 1; }
-.sheet-card { width: 72vh; padding: 5vh; border-radius: 3vh; background: #fffdfa; color: var(--ink); box-shadow: inset 0 0 0 1px var(--card-edge), 0 4vh 10vh rgba(110, 62, 34, 0.2); transform: scale(0.96); transition: transform 0.3s var(--ease); }
-body.sheet-open .sheet-card { transform: scale(1); }
-.sheet-title { font-size: 3.4vh; font-weight: 300; margin-bottom: 1.6vh; }
-.sheet-body { font-size: 2.1vh; line-height: 1.6; color: var(--ink-2); }
-.sheet-body b { color: var(--ink); font-weight: 500; }
-.sheet-list { margin-top: 2.4vh; }
-.sheet-list .row + .row { margin-top: 1vh; }
-.row { height: 6.4vh; padding: 0 2.4vh; border-radius: 1.4vh; display: flex; align-items: center; font-size: 2.3vh; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
-.row.focus { background: var(--ink); color: var(--on-ink); }
+.sheet-card { width: 74vh; padding: 5.4vh; border-radius: 2.4vh; background: var(--wall); color: var(--ink); box-shadow: 0 4vh 10vh rgba(59, 34, 24, 0.3); transform: translateY(2vh); transition: transform 0.35s var(--ease); }
+body.sheet-open .sheet-card { transform: translateY(0); }
+.sheet-title { font-size: 4.4vh; font-weight: 400; font-stretch: 85%; font-variation-settings: "opsz" 60; letter-spacing: -0.01em; margin-bottom: 1.6vh; }
+.sheet-body { font-size: 2.2vh; line-height: 1.6; color: var(--ink-2); }
+.sheet-body b { color: var(--ink); font-weight: 600; }
+.sheet-list { margin-top: 2.6vh; }
+.sheet-list .row + .row { margin-top: 0.8vh; }
+.row { height: 6.4vh; padding: 0 2.4vh; border-radius: 1.2vh; display: flex; align-items: center; font-size: 2.4vh; font-weight: 500; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
+.row.focus { background: var(--wood); color: var(--cream); }
 
 /* Samsung: the HDMI picture shows through a transparent page. */
-body.passthrough, body.passthrough .sky, body.passthrough main, body.passthrough .drawer, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }
+body.passthrough, body.passthrough .wall, body.passthrough .top, body.passthrough .clock, body.passthrough .shelf, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }

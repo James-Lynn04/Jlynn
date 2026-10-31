@@ -4,9 +4,12 @@ A minimal homescreen for two TVs: a TCL Google TV and a Samsung. One shared desi
 
 ![Home](docs/home.jpg)
 
-- Big clock, date and greeting. The background shifts with the time of day.
-- A dock: Netflix, Disney+, Prime Video, Spotify, Chromecast.
-- Press Down for every other app. Press Up for Inputs and Settings.
+- A white wall lit by the real sun. The light crosses from left at sunrise to right at sunset, warm at both ends. After dark a low lamp glows in the corner and the wall dims.
+- A large clock stands on a chestnut console. The orange colon breathes slowly.
+- The console holds the dock: Netflix, Disney+, Prime Video, Spotify, Chromecast. The selected app lifts and lamplight pools under it.
+- Press Down and the console rises to show every other app. Press Up for Inputs and Settings.
+- Sunrise or sunset time for your city, set in `web/config.js`.
+- Typeface: Bricolage Grotesque, bundled in `web/fonts` (SIL Open Font License).
 - No ads, no tracking, no network calls. Everything runs on the TV.
 
 | All apps | Chromecast |
@@ -18,7 +21,7 @@ A minimal homescreen for two TVs: a TCL Google TV and a Samsung. One shared desi
 | Folder | What it is |
 |---|---|
 | `web/` | The homescreen UI. HTML, CSS, JS. Both TVs run this. |
-| `web/config.js` | Dock apps, clock format, your name, hidden apps. Edit this. |
+| `web/config.js` | Dock apps, clock format, your city, hidden apps. Edit this. |
 | `android/` | TCL launcher. A full-screen WebView with a bridge to list and open apps and switch HDMI inputs. |
 | `tizen/` | Samsung app manifest and icon. |
 | `tools/` | Install and restore scripts. |
