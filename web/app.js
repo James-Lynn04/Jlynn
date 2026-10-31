@@ -7,7 +7,7 @@
   const BACK_KEYS = [10009, 27, 8, 461]; // Samsung, Esc, Backspace, LG
 
   // zone: 'list' | 'top' | 'sheet'. `items` is every focusable line: the dock first, then all other apps.
-  const state = { zone: 'list', i: 0, top: 0, sheet: 0, items: [], sheetRows: [], sheetFrom: 'list' };
+  const state = { zone: 'list', i: 0, dockLen: 0, top: 0, sheet: 0, items: [], sheetRows: [], sheetFrom: 'list' };
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -31,8 +31,13 @@
   }
 
   // ---------- Apps ----------
+  // Dock lines meant for this TV. `tvs` limits a line to 'android' or 'tizen'; the browser preview shows all.
+  function dockFor() {
+    return cfg.dock.filter((item) => !item.tvs || host.kind === 'demo' || item.tvs.indexOf(host.kind) >= 0);
+  }
+
   function matchDock(item, apps) {
-    if (item.type === 'cast') return null;
+    if (item.type === 'cast' || item.type === 'input') return null;
     if (host.kind === 'android') {
       for (const id of item.android) {
         const hit = apps.find((a) => a.id === id);
@@ -47,21 +52,25 @@
 
   function render(apps) {
     const used = {};
-    const dock = cfg.dock.map((item) => {
+    const dock = dockFor().map((item) => {
       const app = matchDock(item, apps);
       if (app) used[app.id] = true;
       let sub = '';
       if (item.type === 'cast') sub = 'Cast from your phone';
+      else if (item.type === 'input') sub = savedPort(item) ? savedPort(item).name + '. Right to change' : 'Pick its HDMI port';
       else if (!app) sub = 'Not installed';
       return { kind: 'dock', item, app, name: item.name, sub };
     });
+    state.dockLen = dock.length;
+    // More lines, smaller type, so the dock always fits the page.
+    ROOT.style.setProperty('--big', Math.min(10.5, 64 / (dock.length * 1.12)).toFixed(2));
     const hidden = (a) => cfg.hidden.some((re) => re.test(a.id) || re.test(a.name));
     const rest = apps.filter((a) => !used[a.id] && !hidden(a))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((a) => ({ kind: 'app', app: a, name: a.name }));
     state.items = dock.concat(rest);
 
-    let html = dock.map((d, n) => '<li class="item big' + (!d.app && d.item.type !== 'cast' ? ' missing' : '') + '" data-i="' + n + '">' +
+    let html = dock.map((d, n) => '<li class="item big' + (!d.app && !d.item.type ? ' missing' : '') + '" data-i="' + n + '">' +
       esc(d.name) + (d.sub ? '<span class="sub">' + d.sub + '</span>' : '') + '</li>').join('');
     if (rest.length) {
       html += '<li class="label">All apps</li>';
@@ -131,6 +140,33 @@
     });
   }
 
+  // Devices on an HDMI port (Fire Stick, Xbox). The first press asks which port; the TV remembers it.
+  function savedPort(item) {
+    try { return JSON.parse(store.get('port:' + item.key)); } catch (e) { return null; }
+  }
+
+  function pickPort(item, open) {
+    host.inputs().then((list) => {
+      if (!list.length) return showSheet(item.name, 'Press <b>Source</b> on your remote and pick the port the <b>' + esc(item.device) + '</b> is in.', []);
+      showSheet(item.name, 'Which HDMI port is the <b>' + esc(item.device) + '</b> plugged into? The TV remembers your pick.',
+        list.map((i) => ({ label: i.name, run: () => {
+          store.set('port:' + item.key, JSON.stringify({ id: i.id, name: i.name }));
+          refresh();
+          if (open) host.openInput(i);
+        } })));
+    });
+  }
+
+  function openPort(item) {
+    const saved = savedPort(item);
+    if (!saved) return pickPort(item, true);
+    host.inputs().then((list) => {
+      const hit = list.find((i) => i.id === saved.id);
+      if (hit) host.openInput(hit);
+      else pickPort(item, true);
+    });
+  }
+
   // ---------- Actions ----------
   function activate() {
     if (state.zone === 'list') {
@@ -139,6 +175,7 @@
       if (it.kind === 'app') return host.launch(it.app);
       store.set('dock', state.i);
       if (it.item.type === 'cast') return castTo(it.item);
+      if (it.item.type === 'input') return openPort(it.item);
       if (it.app) return host.launch(it.app);
       const msg = host.storeFor(it.item);
       if (msg) showSheet(msg.title, msg.body, []);
@@ -156,7 +193,7 @@
   function back() {
     if (state.zone === 'sheet') return closeSheet(), true;
     if (state.zone === 'top') return go('list'), true;
-    if (state.i >= cfg.dock.length) { state.i = 0; return paint(), true; }
+    if (state.i >= state.dockLen) { state.i = 0; return paint(), true; }
     return host.back();
   }
   window.tvBack = back; // called by the Android shell
@@ -169,6 +206,8 @@
         state.i--;
       }
       if (key === KEY.DOWN) state.i = Math.min(state.items.length - 1, state.i + 1);
+      const it = state.items[state.i];
+      if (key === KEY.RIGHT && it && it.item && it.item.type === 'input') return pickPort(it.item, false);
     } else if (z === 'top') {
       const n = topButtons().length;
       if (key === KEY.LEFT) state.top = Math.max(0, state.top - 1);
@@ -193,13 +232,13 @@
   window.tvOnResume = () => {
     ROOT.classList.remove('sheet-open');
     state.zone = 'list';
-    if (state.i >= cfg.dock.length) state.i = 0;
+    if (state.i >= state.dockLen) state.i = 0;
     refresh();
   };
 
   // ---------- Start ----------
   if (!host.caps.settings) $('settingsBtn').classList.add('off');
-  state.i = Math.min(Number(store.get('dock')) || 0, cfg.dock.length - 1);
+  state.i = Number(store.get('dock')) || 0;
   tick();
   setInterval(tick, 5000);
   refresh();

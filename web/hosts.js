@@ -89,7 +89,7 @@ function demoHost() {
     caps: { settings: true },
     apps: () => Promise.resolve(names.map((n) => ({ id: pkg[n] || 'demo.' + n.toLowerCase().replace(/\W/g, ''), name: n }))),
     launch: (app) => sheet('Opening ' + app.name, 'On the TV this opens the app.'),
-    inputs: () => Promise.resolve([{ id: 'hdmi1', name: 'HDMI 1' }, { id: 'hdmi2', name: 'HDMI 2' }, { id: 'tv', name: 'Live TV' }]),
+    inputs: () => Promise.resolve([{ id: 'hdmi1', name: 'HDMI 1' }, { id: 'hdmi2', name: 'HDMI 2' }, { id: 'hdmi3', name: 'HDMI 3' }, { id: 'hdmi4', name: 'HDMI 4' }]),
     openInput: (input) => sheet('Switching to ' + input.name, 'On the TV this changes the source.'),
     settings: () => sheet('Settings', 'On the TV this opens system settings.'),
     deviceName: () => 'Living Room TV',

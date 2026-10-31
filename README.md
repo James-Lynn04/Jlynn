@@ -9,6 +9,7 @@ A minimal homescreen for two TVs: a TCL Google TV and a Samsung. One shared desi
 - Press Down past the dock and the list continues with every other app in smaller type.
 - One warm sun on the right. It warms through the day and sinks and dims at night.
 - Time and date top left. Inputs and Settings top right.
+- Samsung only: Live TV (the Fire Stick) and Xbox. Each switches the TV to its HDMI port. The first press asks which port, and the TV remembers it. Press Right on the line to change it.
 - Typeface: Bricolage Grotesque, bundled in `web/fonts` (SIL Open Font License).
 - No ads, no tracking, no network calls. Everything runs on the TV.
 
@@ -50,6 +51,7 @@ Preview on a laptop: open `web/index.html` in Chrome. Up and Down move, Enter op
 |---|---|---|
 | Replaces the Home button | Yes | No. Samsung locks Smart Hub. It installs as an app; pin it first in the Apps row. |
 | Removes the ad rows | Yes, by disabling the stock home (reversible) | No |
+| Live TV and Xbox lines | Hidden. Add `'android'` to `tvs` in `web/config.js` to show them. | Shows the Fire Stick or Xbox HDMI port full screen (depends on the model allowing it). Otherwise opens the input list. Back returns home. |
 | Chromecast line | Opens a Chromecast HDMI input if one exists, else shows how to cast to the TV's built-in Chromecast | Shows the Chromecast HDMI input full screen (depends on the model allowing it). Otherwise opens the input list. Back returns home. |
 | Settings button | Opens system settings | Hidden. Samsung blocks it. Use the remote. |
 | Supported models | Android 7+ | 2019 or newer |

@@ -78,7 +78,7 @@ body[data-tod="night"] .sun { opacity: 0.55; transform: translateY(18vh) scale(0
 .item.focus { color: var(--ink); }
 .item.focus::before { transform: scale(1); }
 .big {
-  font-size: 10.5vh; line-height: 1.12; font-weight: 300; font-stretch: 80%; letter-spacing: -0.02em;
+  font-size: calc(var(--big, 10.5) * 1vh); line-height: 1.12; font-weight: 300; font-stretch: 80%; letter-spacing: -0.02em;
   font-variation-settings: "opsz" 96, "wdth" 80;
   margin-left: -4.4vh;
 }
