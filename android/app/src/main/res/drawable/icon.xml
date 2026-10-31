@@ -2,7 +2,7 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="96dp" android:height="96dp"
     android:viewportWidth="96" android:viewportHeight="96">
-    <path android:fillColor="#08090C" android:pathData="M20,0h56a20,20 0,0 1,20 20v56a20,20 0,0 1,-20 20h-56a20,20 0,0 1,-20 -20v-56a20,20 0,0 1,20 -20z" />
-    <path android:strokeColor="#F4F2EE" android:strokeWidth="3" android:strokeLineCap="round"
+    <path android:fillColor="#F8F4EF" android:pathData="M20,0h56a20,20 0,0 1,20 20v56a20,20 0,0 1,-20 20h-56a20,20 0,0 1,-20 -20v-56a20,20 0,0 1,20 -20z" />
+    <path android:strokeColor="#4A2E22" android:strokeWidth="3" android:strokeLineCap="round"
         android:pathData="M48,48m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0M48,34v14l9,7" />
 </vector>

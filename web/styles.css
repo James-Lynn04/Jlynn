@@ -1,23 +1,28 @@
 /* Sized in vh so the layout is identical at 960x540, 1920x1080 and 3840x2160. */
 :root {
-  --bg: #08090c;
-  --ink: #f4f2ee;
-  --ink-2: rgba(244, 242, 238, 0.62);
-  --ink-3: rgba(244, 242, 238, 0.38);
-  --card: rgba(255, 255, 255, 0.055);
-  --card-edge: rgba(255, 255, 255, 0.09);
-  --focus: #ffffff;
-  --a: #2b3a67;
-  --b: #6b4a3a;
-  --c: #1d4a4f;
+  /* Warm white walls, chestnut wood, orange accents, lamplight. */
+  --bg: #f8f4ef;
+  --fade: rgba(248, 244, 239, 0.85);
+  --ink: #4a2e22;
+  --ink-2: rgba(74, 46, 34, 0.66);
+  --ink-3: rgba(74, 46, 34, 0.42);
+  --card: rgba(255, 255, 255, 0.72);
+  --card-edge: rgba(74, 46, 34, 0.07);
+  --shadow: rgba(110, 62, 34, 0.10);
+  --accent: #e07b39;
+  --on-ink: #fbf7f2;
+  --a: #ffd7b0;
+  --b: #e9b48e;
+  --c: #ffe6c9;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 /* Palette follows the time of day; app.js sets body[data-tod]. */
-body[data-tod="morning"] { --a: #5a4630; --b: #2f4a63; --c: #6a5a3e; }
-body[data-tod="day"]     { --a: #24496b; --b: #3b5e6e; --c: #2a3f5c; }
-body[data-tod="evening"] { --a: #4a2f52; --b: #7a4a32; --c: #2b3560; }
-body[data-tod="night"]   { --a: #161d3a; --b: #2a1f3a; --c: #0f2a33; }
+/* Morning is bright and peach, evening glows orange, night dims like a lamp turned low. */
+body[data-tod="morning"] { --a: #ffe0bf; --b: #f7cfa6; --c: #fff1e0; }
+body[data-tod="day"]     { --a: #fde6cc; --b: #efd2b8; --c: #fff4e6; }
+body[data-tod="evening"] { --a: #f6b37e; --b: #d99872; --c: #ffd2a6; --bg: #f3ebe2; --fade: rgba(243, 235, 226, 0.85); }
+body[data-tod="night"]   { --a: #e6a06d; --b: #b98063; --c: #efc095; --bg: #e7ddd2; --fade: rgba(231, 221, 210, 0.88); --card: rgba(255, 252, 248, 0.6); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
@@ -32,22 +37,22 @@ button { font: inherit; color: inherit; background: none; border: 0; outline: no
 
 /* Ambient background: large soft gradients drifting slowly. Transform only, cheap on TV GPUs. */
 .sky { position: fixed; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; transition: opacity 0.6s; }
-.glow { position: absolute; width: 120vh; height: 120vh; border-radius: 50%; opacity: 0.55; transition: background 4s; }
+.glow { position: absolute; width: 120vh; height: 120vh; border-radius: 50%; opacity: 0.9; transition: background 4s; }
 .g1 { left: -30vh; top: -40vh; background: radial-gradient(closest-side, var(--a), transparent); animation: drift1 70s ease-in-out infinite alternate; }
 .g2 { right: -40vh; bottom: -55vh; background: radial-gradient(closest-side, var(--b), transparent); animation: drift2 90s ease-in-out infinite alternate; }
-.g3 { left: 45%; top: 20vh; width: 90vh; height: 90vh; background: radial-gradient(closest-side, var(--c), transparent); opacity: 0.4; animation: drift3 110s ease-in-out infinite alternate; }
+.g3 { left: 45%; top: 20vh; width: 90vh; height: 90vh; background: radial-gradient(closest-side, var(--c), transparent); opacity: 0.8; animation: drift3 110s ease-in-out infinite alternate; }
 @keyframes drift1 { to { transform: translate(40vh, 18vh) scale(1.15); } }
 @keyframes drift2 { to { transform: translate(-50vh, -20vh) scale(1.1); } }
 @keyframes drift3 { to { transform: translate(-35vh, 15vh) scale(0.85); } }
-.sky::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(180deg, rgba(8,9,12,0) 40%, rgba(8,9,12,0.7) 100%); }
+.sky::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(180deg, rgba(255,255,255,0) 50%, var(--fade) 100%); }
 
-main { position: fixed; top: 0; right: 0; bottom: 0; left: 0; padding: 8vh 8vh; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.5s var(--ease), opacity 0.5s var(--ease); }
-body.drawer-open main { transform: translateY(-14vh); opacity: 0.25; }
+main { position: fixed; top: 0; right: 0; bottom: 0; left: 0; padding: 8vh 9vh; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.5s var(--ease), opacity 0.5s var(--ease); }
+body.drawer-open main { transform: translateY(-14vh); opacity: 0.35; }
 
 /* Clock */
 .top { display: flex; justify-content: space-between; align-items: flex-start; }
-.clock { font-size: 19vh; font-weight: 200; letter-spacing: -0.03em; line-height: 0.9; font-variant-numeric: tabular-nums; }
-.ampm { font-size: 3.2vh; font-weight: 400; letter-spacing: 0.12em; margin-left: 1.6vh; color: var(--ink-2); vertical-align: 11.5vh; }
+.clock { font-size: 19vh; font-weight: 200; color: var(--ink); letter-spacing: -0.03em; line-height: 0.9; font-variant-numeric: tabular-nums; }
+.ampm { font-size: 3.2vh; font-weight: 400; letter-spacing: 0.12em; margin-left: 1.6vh; color: var(--accent); vertical-align: 11.5vh; }
 .date { margin-top: 2.6vh; font-size: 2.1vh; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-2); }
 .greeting { margin-top: 1.2vh; font-size: 3.3vh; font-weight: 300; color: var(--ink); }
 
@@ -56,10 +61,10 @@ body.drawer-open main { transform: translateY(-14vh); opacity: 0.25; }
 .pill {
   height: 5.6vh; padding: 0 2.8vh; border-radius: 2.8vh;
   font-size: 2vh; letter-spacing: 0.06em; color: var(--ink-2);
-  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge);
+  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 0.6vh 2vh var(--shadow);
   transition: transform 0.25s var(--ease), background 0.25s, color 0.25s;
 }
-.pill.focus { background: var(--ink); color: #111; transform: scale(1.06); box-shadow: 0 1vh 4vh rgba(0,0,0,0.5); }
+.pill.focus { background: var(--ink); color: var(--on-ink); transform: scale(1.06); box-shadow: 0 1vh 3vh var(--shadow); }
 .pill.off { display: none; }
 
 /* Dock */
@@ -67,20 +72,22 @@ body.drawer-open main { transform: translateY(-14vh); opacity: 0.25; }
 .dock { display: flex; }
 .dock .tile + .tile { margin-left: 3vh; }
 .tile {
-  position: relative; width: 27vh; height: 15.2vh; border-radius: 1.8vh; overflow: hidden;
-  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge);
+  position: relative; width: 27vh; height: 15.2vh; border-radius: 2.2vh; overflow: hidden;
+  background: var(--card); box-shadow: inset 0 0 0 1px var(--card-edge), 0 0.8vh 2.6vh var(--shadow);
   display: flex; align-items: center; justify-content: center;
-  opacity: 0.72; transform: scale(1);
+  opacity: 0.9; transform: scale(1); color: var(--ink);
   transition: transform 0.3s var(--ease), opacity 0.3s, box-shadow 0.3s;
 }
 .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tile .name { font-size: 2.7vh; font-weight: 400; letter-spacing: 0.02em; }
-.tile.missing { opacity: 0.35; }
+.tile.missing { opacity: 0.45; }
 .tile.focus {
   opacity: 1; transform: scale(1.12);
-  box-shadow: 0 0 0 0.35vh var(--focus), 0 2.4vh 6vh rgba(0,0,0,0.55);
+  background: #ffffff;
+  box-shadow: 0 0 0 0.35vh var(--accent), 0 2.4vh 5vh rgba(110, 62, 34, 0.22);
 }
-.tile .glyph { width: 7vh; height: 7vh; }
+.tile .glyph { width: 7vh; height: 7vh; color: var(--ink-2); }
+.tile.focus .glyph { color: var(--accent); }
 .dock-label { margin-top: 4.2vh; height: 3vh; font-size: 2.4vh; letter-spacing: 0.04em; color: var(--ink); transition: opacity 0.3s; }
 .dock-label .sub { color: var(--ink-3); margin-left: 1.2vh; }
 .hint { margin-top: 3.4vh; font-size: 1.6vh; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink-3); display: flex; flex-direction: column; align-items: center; }
@@ -93,7 +100,7 @@ body.drawer-open .hint, body.drawer-open .dock-wrap { opacity: 0; }
 /* All apps drawer */
 .drawer {
   position: fixed; left: 0; right: 0; bottom: 0; height: 66vh; padding: 5vh 8vh 6vh;
-  background: linear-gradient(180deg, rgba(10,11,14,0) 0%, rgba(10,11,14,0.92) 14%, rgba(10,11,14,0.98) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, var(--fade) 14%, var(--bg) 40%);
   transform: translateY(100%); transition: transform 0.5s var(--ease);
 }
 body.drawer-open .drawer { transform: translateY(0); }
@@ -104,9 +111,9 @@ body.drawer-open .drawer { transform: translateY(0); }
 .grid .tile.focus { transform: scale(1.08); }
 
 /* Sheet: inputs list, cast card */
-.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(5,6,8,0.6); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(74, 46, 34, 0.18); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 body.sheet-open .sheet { opacity: 1; }
-.sheet-card { width: 72vh; padding: 5vh; border-radius: 3vh; background: rgba(22,24,30,0.96); box-shadow: inset 0 0 0 1px var(--card-edge), 0 4vh 12vh rgba(0,0,0,0.6); transform: scale(0.96); transition: transform 0.3s var(--ease); }
+.sheet-card { width: 72vh; padding: 5vh; border-radius: 3vh; background: #fffdfa; color: var(--ink); box-shadow: inset 0 0 0 1px var(--card-edge), 0 4vh 10vh rgba(110, 62, 34, 0.2); transform: scale(0.96); transition: transform 0.3s var(--ease); }
 body.sheet-open .sheet-card { transform: scale(1); }
 .sheet-title { font-size: 3.4vh; font-weight: 300; margin-bottom: 1.6vh; }
 .sheet-body { font-size: 2.1vh; line-height: 1.6; color: var(--ink-2); }
@@ -114,7 +121,7 @@ body.sheet-open .sheet-card { transform: scale(1); }
 .sheet-list { margin-top: 2.4vh; }
 .sheet-list .row + .row { margin-top: 1vh; }
 .row { height: 6.4vh; padding: 0 2.4vh; border-radius: 1.4vh; display: flex; align-items: center; font-size: 2.3vh; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
-.row.focus { background: var(--ink); color: #111; }
+.row.focus { background: var(--ink); color: var(--on-ink); }
 
 /* Samsung: the HDMI picture shows through a transparent page. */
 body.passthrough, body.passthrough .sky, body.passthrough main, body.passthrough .drawer, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }

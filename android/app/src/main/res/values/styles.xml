@@ -3,5 +3,5 @@
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:windowAnimationStyle">@null</item>
     </style>
-    <color name="bg">#08090C</color>
+    <color name="bg">#F8F4EF</color>
 </resources>

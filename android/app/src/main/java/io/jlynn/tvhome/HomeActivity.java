@@ -55,7 +55,7 @@ public class HomeActivity extends Activity {
                 View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         web = new WebView(this);
-        web.setBackgroundColor(Color.rgb(8, 9, 12));
+        web.setBackgroundColor(Color.rgb(248, 244, 239));
         web.setFocusable(true);
         web.setFocusableInTouchMode(true);
         WebSettings s = web.getSettings();
