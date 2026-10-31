@@ -8,11 +8,12 @@
 </head>
 <body>
   <div class="sun" aria-hidden="true"></div>
-  <!-- Gameday backdrop: a large silver star. -->
-  <svg class="star" viewBox="0 0 100 100" aria-hidden="true">
-    <defs><linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9edf0"/><stop offset="0.55" stop-color="#9aa5ad"/><stop offset="1" stop-color="#5d6a74"/></linearGradient></defs>
-    <polygon points="50,4 61.8,38.2 97.6,38.2 68.6,59.4 79.4,93.6 50,72.4 20.6,93.6 31.4,59.4 2.4,38.2 38.2,38.2" fill="url(#silver)"/>
-  </svg>
+  <!-- Gameday backdrop: stadium lights, broadcast stripes and a DALLAS wordmark. -->
+  <div class="field" aria-hidden="true">
+    <div class="lights"></div>
+    <div class="stripes"><i></i><i></i><i></i></div>
+    <div class="wordmark">DALLAS</div>
+  </div>
 
   <header class="bar">
     <div class="when"><span id="time"></span><span id="date" class="date"></span></div>
@@ -29,9 +30,17 @@
     <div id="gMeta" class="g-meta"></div>
     <div id="gOdds" class="g-odds"></div>
   </section>
-  <section class="slate">
-    <div id="slateTitle" class="slate-title">Today's games</div>
-    <ul id="gList" class="slate-list"></ul>
+  <section class="board">
+    <!-- Scorebug: away and home, with the kickoff countdown or the live score between them. -->
+    <div class="bug">
+      <div class="team" id="bugAway"><b></b><span></span></div>
+      <div class="mid"><div id="bugState" class="bug-state"></div><div id="bugClock" class="bug-clock"></div></div>
+      <div class="team" id="bugHome"><b></b><span></span></div>
+    </div>
+    <div class="panel">
+      <div id="slateTitle" class="slate-title">Today's games</div>
+      <ul id="gList" class="slate-list"></ul>
+    </div>
   </section>
 
   <!-- Every app as a line of type. The dock comes first in large type, then all other apps. -->

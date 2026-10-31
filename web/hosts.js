@@ -96,14 +96,14 @@ function demoHost() {
     storeFor: (item) => ({ title: item.name + ' is not installed', body: 'On the TV this opens the store.' }),
     // Four of the November 1, 2026 games, for the preview only. The TV loads every game from ESPN.
     schedule: () => {
-      // Odds found online on Oct 31: DraftKings ARI +230 / DAL -285, DAL -6, O/U 54.5.
+      // Records (ARI 2-5, DAL 3-4) and odds found online on Oct 31: DraftKings ARI +230 / DAL -285, DAL -6, O/U 54.5.
       // For the other games only the favorite was found, so no moneyline is shown.
       const g = (utc, away, home, network, venue, mine, odds) => ({
         start: new Date(utc), state: 'pre', detail: '', network, venue, mine: !!mine, odds: odds || null,
-        away: { abbr: away[0], name: away[1], score: '0' }, home: { abbr: home[0], name: home[1], score: '0' }
+        away: { abbr: away[0], name: away[1], score: '0', record: away[2] || '' }, home: { abbr: home[0], name: home[1], score: '0', record: home[2] || '' }
       });
       return Promise.resolve({ week: 8, games: [
-        g('2026-11-01T18:00:00Z', ['ARI', 'Cardinals'], ['DAL', 'Cowboys'], 'FOX', 'AT&T Stadium', true, { fav: 'DAL', home: -285, away: 230, details: 'DAL -6', total: 54.5 }),
+        g('2026-11-01T18:00:00Z', ['ARI', 'Cardinals', '2-5'], ['DAL', 'Cowboys', '3-4'], 'FOX', 'AT&T Stadium', true, { fav: 'DAL', home: -285, away: 230, details: 'DAL -6', total: 54.5 }),
         g('2026-11-01T18:00:00Z', ['BAL', 'Ravens'], ['BUF', 'Bills'], 'CBS', 'Highmark Stadium', false, { fav: 'BUF', home: null, away: null }),
         g('2026-11-01T21:25:00Z', ['NE', 'Patriots'], ['MIA', 'Dolphins'], 'CBS', 'Hard Rock Stadium'),
         g('2026-11-02T01:20:00Z', ['PHI', 'Eagles'], ['WSH', 'Commanders'], 'NBC', 'Northwest Stadium', false, { fav: 'WSH', home: null, away: null })

@@ -114,7 +114,7 @@ body.sheet-open .sheet-card { transform: translateY(0); }
 .row.focus::before { transform: scale(1); }
 
 /* ---------- Gameday: navy, silver and white ---------- */
-.star, .game, .slate, .intro-video { display: none; }
+.field, .game, .board, .intro-video { display: none; }
 body.gameday {
   --paper: #041e42;
   --ink: #ffffff;
@@ -122,10 +122,27 @@ body.gameday {
   --ink-faint: rgba(255, 255, 255, 0.34);
   --orange: #c4ccd2;
   --silver: #a7b1b8;
-  background: radial-gradient(ellipse 120vh 90vh at 20% 0%, #0a2f63 0%, #041e42 55%, #021430 100%);
+  --royal: #0a3d8f;
+  background: linear-gradient(160deg, #06244f 0%, #041e42 45%, #021430 100%);
 }
 body.gameday .sun { display: none; }
-body.gameday .star { display: block; position: fixed; right: -14vh; bottom: -26vh; width: 104vh; height: 104vh; opacity: 0.16; }
+body.gameday .field { display: block; position: fixed; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; }
+/* Stadium lights over the top right. */
+.lights { position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background:
+    radial-gradient(ellipse 60vh 34vh at 78% -6%, rgba(214, 228, 255, 0.34), rgba(214, 228, 255, 0) 70%),
+    radial-gradient(ellipse 40vh 26vh at 98% 4%, rgba(214, 228, 255, 0.22), rgba(214, 228, 255, 0) 70%),
+    radial-gradient(ellipse 90vh 60vh at 90% 110%, rgba(10, 61, 143, 0.55), rgba(10, 61, 143, 0) 70%); }
+/* Broadcast stripes sweeping up behind the scoreboard. */
+.stripes { position: absolute; left: 92vh; top: -20vh; width: 60vh; height: 150vh; transform: skewX(-24deg); display: flex; }
+.stripes i { display: block; height: 100%; margin-right: 1.6vh; }
+.stripes i:nth-child(1) { width: 5vh; background: linear-gradient(180deg, rgba(196, 204, 210, 0) 0%, rgba(196, 204, 210, 0.38) 45%, rgba(196, 204, 210, 0.08) 100%); }
+.stripes i:nth-child(2) { width: 1.4vh; background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0.05) 100%); }
+.stripes i:nth-child(3) { width: 9vh; background: linear-gradient(180deg, rgba(10, 61, 143, 0) 0%, rgba(10, 61, 143, 0.75) 55%, rgba(10, 61, 143, 0.2) 100%); }
+/* Outlined team wordmark along the bottom right. */
+.wordmark { position: absolute; right: -3vh; bottom: -7vh; font-size: 36vh; line-height: 1; font-weight: 800; font-style: normal;
+  font-stretch: 75%; font-variation-settings: "opsz" 96, "wdth" 75, "wght" 800; letter-spacing: -0.01em;
+  color: transparent; -webkit-text-stroke: 0.22vh rgba(196, 204, 210, 0.3); transform: skewX(-10deg); }
 body.gameday .game { display: block; position: fixed; left: 9vh; top: 17vh; width: 92vh; }
 .g-eyebrow { font-size: 2vh; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silver); }
 .g-title { margin-top: 1.2vh; font-size: 9vh; line-height: 1; font-weight: 600; font-stretch: 78%; letter-spacing: -0.015em; font-variation-settings: "opsz" 96, "wdth" 78, "wght" 600; }
@@ -140,8 +157,25 @@ body.gameday .big { font-stretch: 85%; letter-spacing: -0.01em; }
 body.gameday .item::before { border-radius: 0; clip-path: polygon(50% 0, 61.8% 34.5%, 97.6% 34.5%, 68.6% 56.6%, 79.4% 91%, 50% 70%, 20.6% 91%, 31.4% 56.6%, 2.4% 34.5%, 38.2% 34.5%); background: #ffffff; }
 body.gameday .label { color: var(--ink-faint); }
 
-body.gameday .slate { display: block; position: fixed; right: 9vh; top: 17vh; bottom: 8vh; width: 60vh; }
-.slate-title { font-size: 2vh; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silver); margin-bottom: 1.6vh; }
+body.gameday .board { display: block; position: fixed; right: 9vh; top: 15vh; width: 66vh; }
+/* Scorebug */
+.bug { display: flex; align-items: stretch; height: 13vh; border-radius: 1.4vh; overflow: hidden;
+  background: linear-gradient(180deg, #0d2f66 0%, #061f47 100%);
+  box-shadow: inset 0 0 0 0.25vh rgba(196, 204, 210, 0.55), 0 2vh 5vh rgba(0, 0, 0, 0.35); }
+.bug .team { width: 21vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.bug .team b { font-size: 6vh; line-height: 1; font-weight: 800; font-stretch: 78%; font-variation-settings: "opsz" 96, "wdth" 78, "wght" 800; letter-spacing: 0.01em; }
+.bug .team span { margin-top: 0.8vh; font-size: 2vh; font-weight: 500; color: var(--silver); font-variant-numeric: tabular-nums; }
+.bug .team.mine { background: linear-gradient(180deg, #e9edf0 0%, #a7b1b8 100%); color: #041e42; }
+.bug .team.mine span { color: rgba(4, 30, 66, 0.7); }
+.bug .mid { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 0.2vh solid rgba(196, 204, 210, 0.35); border-right: 0.2vh solid rgba(196, 204, 210, 0.35); }
+.bug-state { font-size: 1.7vh; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--silver); }
+.bug-clock { margin-top: 0.6vh; font-size: 4.6vh; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+/* Scoreboard panel */
+.panel { margin-top: 2.4vh; padding: 2.4vh 2.4vh 1.6vh; border-radius: 1.4vh;
+  background: rgba(2, 16, 40, 0.72); box-shadow: inset 0 0 0 0.2vh rgba(196, 204, 210, 0.28); }
+.slate-title { display: flex; align-items: center; font-size: 2vh; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #ffffff; margin-bottom: 1.4vh; padding-left: 2vh; }
+.slate-title::before { content: ""; width: 2vh; height: 2vh; margin-right: 1.4vh; background: var(--silver);
+  clip-path: polygon(50% 0, 61.8% 34.5%, 97.6% 34.5%, 68.6% 56.6%, 79.4% 91%, 50% 70%, 20.6% 91%, 31.4% 56.6%, 2.4% 34.5%, 38.2% 34.5%); }
 .slate-list { list-style: none; }
 .g { display: flex; align-items: center; height: 5.4vh; padding: 0 2vh; border-radius: 1vh; font-size: 2.5vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .g + .g { border-top: 1px solid rgba(255, 255, 255, 0.07); }
@@ -153,7 +187,7 @@ body.gameday .slate { display: block; position: fixed; right: 9vh; top: 17vh; bo
 .g .o b { color: var(--ink-2); font-weight: 500; }
 .g.mine .o, .g.mine .o b { color: var(--ink); }
 .g .n { width: 7vh; text-align: right; color: var(--ink-faint); }
-.g.mine { background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)); border-top-color: transparent; }
+.g.mine { background: linear-gradient(90deg, var(--royal), rgba(10, 61, 143, 0.35)); box-shadow: inset 0.5vh 0 0 #ffffff; border-top-color: transparent; }
 .g.mine + .g { border-top-color: transparent; }
 .g.mine .t, .g.mine .n { color: var(--ink); }
 .g.empty { color: var(--ink-faint); }
@@ -166,4 +200,4 @@ body.gameday .sheet { background: rgba(4, 30, 66, 0.92); }
 body.intro .intro-video { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; background: #000; z-index: 10; }
 
 /* Samsung: the HDMI picture shows through a transparent page. */
-body.passthrough, body.passthrough .sun, body.passthrough .star, body.passthrough .game, body.passthrough .slate, body.passthrough .bar, body.passthrough .viewport, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }
+body.passthrough, body.passthrough .sun, body.passthrough .field, body.passthrough .game, body.passthrough .board, body.passthrough .bar, body.passthrough .viewport, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }

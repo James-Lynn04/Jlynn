@@ -69,7 +69,7 @@
       const c = e.competitions[0];
       const side = (h) => {
         const t = c.competitors.find((x) => x.homeAway === h);
-        return { abbr: t.team.abbreviation, name: t.team.shortDisplayName, score: t.score };
+        return { abbr: t.team.abbreviation, name: t.team.shortDisplayName, score: t.score, record: t.records && t.records[0] ? t.records[0].summary : '' };
       };
       const home = side('home'), away = side('away');
       const b = (c.broadcasts || [])[0];
@@ -121,7 +121,33 @@
 
   function myGame() { return gd.games.find((x) => x.mine); }
 
+  // Scorebug: record before kickoff, score once the game starts; countdown or game clock in the middle.
+  function paintBug() {
+    const g = myGame();
+    const team = cfg.gameday.team;
+    const side = (id, t) => {
+      const el = $(id);
+      el.className = 'team' + (t && t.abbr === team ? ' mine' : '');
+      el.children[0].textContent = t ? t.abbr : '';
+      el.children[1].textContent = !t ? '' : g.state === 'pre' ? (t.record || '') : t.score;
+    };
+    side('bugAway', g && g.away);
+    side('bugHome', g && g.home);
+    if (!g) { $('bugState').textContent = 'No game today'; $('bugClock').textContent = ''; return; }
+    if (g.state === 'pre') {
+      const left = Math.max(0, Math.floor((g.start - Date.now()) / 1000));
+      const hh = Math.floor(left / 3600), mm = Math.floor(left % 3600 / 60), ss = left % 60;
+      $('bugState').textContent = left ? 'Kickoff in' : 'Kickoff';
+      $('bugClock').textContent = left > 86400 ? kickoff(g.start) : hh + ':' + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+    } else {
+      $('bugState').textContent = g.state === 'in' ? 'Live' : 'Final';
+      $('bugClock').textContent = g.state === 'in' ? g.detail : g.away.score + ' - ' + g.home.score;
+    }
+  }
+  setInterval(() => { if (gd.on) paintBug(); }, 1000);
+
   function paintGame() {
+    paintBug();
     const g = myGame();
     const team = cfg.gameday.team;
     $('gEyebrow').textContent = 'Gameday' + (gd.week ? '  ·  Week ' + gd.week : '');
