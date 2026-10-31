@@ -29,7 +29,8 @@ window.HOME_CONFIG = {
     fromHour: 8,
     months: [9, 10, 11, 12, 1, 2],
     tvs: ['tizen'],
-    intro: 'intro.mp4'        // optional video in web/, plays once when the homescreen opens on gameday
+    // Plays once when the homescreen opens on gameday. A web link (needs the TV online) or a file in web/, e.g. 'intro.mp4'.
+    intro: 'https://d8j0ntlcm91z4.cloudfront.net/user_3H1a5YWLrp0Ghy2JkwRFN6pMAeR/hf_20261031_045430_ed792f24-b206-4dd1-8cdc-33bd6b5dd36b.mp4'
   },
 
   // Apps never shown in the All apps drawer (Android package names or Samsung app names).

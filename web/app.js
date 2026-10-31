@@ -194,8 +194,9 @@
     v.onerror = done;
     v.src = cfg.gameday.intro;
     ROOT.classList.add('intro');
+    // Play with the crowd sound; if the browser refuses sound, play muted instead.
     const p = v.play();
-    if (p && p.catch) p.catch(done);
+    if (p && p.catch) p.catch(() => { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(done); });
     window.skipIntro = done;
   }
 
