@@ -200,6 +200,53 @@
     window.skipIntro = done;
   }
 
+  // ---------- Kickoff countdown (Samsung) ----------
+  // The next team game from ESPN's team schedule. Shown in a football from 7 days before kickoff until kickoff.
+  const kick = { game: null, loaded: 0 };
+
+  function loadNext() {
+    if (Date.now() - kick.loaded < 1800000) return;
+    kick.loaded = Date.now();
+    const got = host.nextGame ? host.nextGame()
+      : fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/' + cfg.gameday.team.toLowerCase() + '/schedule')
+        .then((r) => r.json()).then(parseNext);
+    got.then((g) => { kick.game = g; paintKick(); }).catch(() => { kick.game = null; paintKick(); });
+  }
+
+  function parseNext(data) {
+    const team = cfg.gameday.team;
+    const now = Date.now();
+    const next = (data.events || [])
+      .map((e) => {
+        const c = e.competitions[0];
+        const them = c.competitors.find((x) => x.team.abbreviation !== team);
+        const home = c.competitors.find((x) => x.homeAway === 'home');
+        return { start: new Date(e.date), state: c.status.type.state, opp: them.team.abbreviation, home: home.team.abbreviation === team };
+      })
+      .filter((g) => g.state === 'pre' && g.start.getTime() > now)
+      .sort((a, b) => a.start - b.start)[0];
+    return next || null;
+  }
+
+  function kickOn() {
+    const kind = host.kind === 'demo' ? (window.PREVIEW_TV || 'tizen') : host.kind;
+    return !!cfg.gameday && cfg.gameday.tvs.indexOf(kind) >= 0;
+  }
+
+  function paintKick() {
+    const g = kick.game;
+    const left = g ? Math.floor((g.start - Date.now()) / 1000) : -1;
+    const show = kickOn() && g && left > 0 && left < 7 * 86400;
+    ROOT.classList.toggle('has-kick', !!show);
+    if (!show) return;
+    const d = Math.floor(left / 86400), h = Math.floor(left % 86400 / 3600), m = Math.floor(left % 3600 / 60), sec = left % 60;
+    const two = (n) => String(n).padStart(2, '0');
+    $('kickClock').textContent = d > 0 ? d + 'd ' + h + 'h ' + two(m) + 'm' : h + ':' + two(m) + ':' + two(sec);
+    const day = g.start.toLocaleDateString('en-US', { weekday: 'short' });
+    $('kickGame').textContent = (g.home ? 'vs ' : 'at ') + g.opp + '  ·  ' + day + ' ' + kickoff(g.start);
+  }
+  setInterval(paintKick, 1000);
+
   // ---------- Apps ----------
   // Dock lines meant for this TV. `tvs` limits a line to 'android' or 'tizen'.
   // The browser preview acts as the Samsung unless window.PREVIEW_TV says 'android'.
@@ -420,6 +467,7 @@
   state.i = Number(store.get('dock')) || 0;
   tick();
   setInterval(tick, 5000);
-  window.tvGameday = tick;
+  window.tvGameday = () => { tick(); paintKick(); };
+  if (cfg.gameday) { loadNext(); setInterval(loadNext, 60000); }
   refresh();
 })();

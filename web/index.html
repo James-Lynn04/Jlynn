@@ -54,6 +54,28 @@
     </div>
   </section>
 
+  <!-- Countdown to the next Cowboys kickoff, in a football. Samsung only. -->
+  <div id="kick" class="kick" aria-live="off">
+    <svg class="ball" viewBox="0 0 300 170" aria-hidden="true">
+      <defs>
+        <radialGradient id="leather" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#a5582f"/><stop offset="0.6" stop-color="#7a3a1d"/><stop offset="1" stop-color="#4f230f"/></radialGradient>
+        <clipPath id="ballShape"><path d="M8 85 C 55 8, 245 8, 292 85 C 245 162, 55 162, 8 85 Z"/></clipPath>
+      </defs>
+      <path d="M8 85 C 55 8, 245 8, 292 85 C 245 162, 55 162, 8 85 Z" fill="url(#leather)"/>
+      <g clip-path="url(#ballShape)" stroke="#f4ece2" stroke-width="6" fill="none" opacity="0.9">
+        <path d="M46 0 C 38 50, 38 120, 46 170 M60 0 C 52 50, 52 120, 60 170"/>
+        <path d="M254 0 C 262 50, 262 120, 254 170 M240 0 C 248 50, 248 120, 240 170"/>
+      </g>
+      <path d="M118 36 H 182" stroke="#f4ece2" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M126 29 V 43 M138 29 V 43 M150 29 V 43 M162 29 V 43 M174 29 V 43" stroke="#f4ece2" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+    <div class="kick-text">
+      <div class="kick-label">Kickoff</div>
+      <div id="kickClock" class="kick-clock"></div>
+    </div>
+    <div id="kickGame" class="kick-game"></div>
+  </div>
+
   <video id="intro" class="intro-video" playsinline></video>
 
   <script src="config.js"></script>

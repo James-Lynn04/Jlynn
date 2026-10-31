@@ -109,6 +109,8 @@ function demoHost() {
         g('2026-11-02T01:20:00Z', ['PHI', 'Eagles'], ['WSH', 'Commanders'], 'NBC', 'Northwest Stadium', false, { fav: 'WSH', home: null, away: null })
       ] });
     },
+    // The Cowboys' next game for the preview countdown: vs Cardinals, Nov 1 2026 at noon Central.
+    nextGame: () => Promise.resolve({ start: new Date('2026-11-01T18:00:00Z'), state: 'pre', opp: 'ARI', home: true }),
     back: () => false
   };
 }
