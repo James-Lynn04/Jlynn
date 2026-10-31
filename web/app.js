@@ -201,7 +201,7 @@
   }
 
   // ---------- Kickoff countdown (Samsung) ----------
-  // The next team game from ESPN's team schedule. Shown in a football from 7 days before kickoff until kickoff.
+  // The next team game from ESPN's team schedule. Shown in a football on game day until kickoff.
   const kick = { game: null, loaded: 0 };
 
   function loadNext() {
@@ -236,7 +236,9 @@
   function paintKick() {
     const g = kick.game;
     const left = g ? Math.floor((g.start - Date.now()) / 1000) : -1;
-    const show = kickOn() && g && left > 0 && left < 7 * 86400;
+    // Only on the day the team plays, before kickoff. The browser preview's Gameday switch counts as that day.
+    const today = g && (sameDay(g.start, new Date()) || (host.kind === 'demo' && window.GAMEDAY_OVERRIDE === true));
+    const show = kickOn() && g && left > 0 && today;
     ROOT.classList.toggle('has-kick', !!show);
     if (!show) return;
     const d = Math.floor(left / 86400), h = Math.floor(left % 86400 / 3600), m = Math.floor(left % 3600 / 60), sec = left % 60;
