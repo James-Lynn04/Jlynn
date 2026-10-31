@@ -31,9 +31,11 @@
   }
 
   // ---------- Apps ----------
-  // Dock lines meant for this TV. `tvs` limits a line to 'android' or 'tizen'; the browser preview shows all.
+  // Dock lines meant for this TV. `tvs` limits a line to 'android' or 'tizen'.
+  // The browser preview acts as the Samsung unless window.PREVIEW_TV says 'android'.
   function dockFor() {
-    return cfg.dock.filter((item) => !item.tvs || host.kind === 'demo' || item.tvs.indexOf(host.kind) >= 0);
+    const kind = host.kind === 'demo' ? (window.PREVIEW_TV || 'tizen') : host.kind;
+    return cfg.dock.filter((item) => !item.tvs || item.tvs.indexOf(kind) >= 0);
   }
 
   function matchDock(item, apps) {
