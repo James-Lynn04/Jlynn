@@ -7,34 +7,18 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- The wall, lit by a light that follows the sun. -->
-  <div class="wall" aria-hidden="true"><div class="light"></div></div>
+  <div class="sun" aria-hidden="true"></div>
 
-  <header class="top">
-    <div class="meta">
-      <div id="date" class="date"></div>
-      <div id="sun" class="sun"></div>
-    </div>
-    <nav class="actions">
+  <header class="bar">
+    <div class="when"><span id="time"></span><span id="date" class="date"></span></div>
+    <nav class="menu">
       <button class="pill" data-zone="top" data-action="inputs">Inputs</button>
       <button class="pill" data-zone="top" data-action="settings" id="settingsBtn">Settings</button>
     </nav>
   </header>
 
-  <!-- The clock stands on the console. -->
-  <div class="clock" aria-live="off"><span id="hh"></span><span class="colon">:</span><span id="mm"></span><span id="ampm" class="ampm"></span></div>
-
-  <!-- The console: a chestnut shelf that holds the apps and rises for All apps. -->
-  <section class="shelf">
-    <div class="shelf-head">
-      <div id="dock" class="dock"></div>
-      <div class="hint">All apps<span class="chev"></span></div>
-    </div>
-    <div id="dockLabel" class="dock-label">&nbsp;</div>
-    <div id="drawer" class="drawer">
-      <div id="grid" class="grid"></div>
-    </div>
-  </section>
+  <!-- Every app as a line of type. The dock comes first in large type, then all other apps. -->
+  <div class="viewport"><ul id="list" class="list"></ul></div>
 
   <section id="sheet" class="sheet" aria-hidden="true">
     <div class="sheet-card">

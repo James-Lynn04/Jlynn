@@ -1,6 +1,5 @@
-/* Sized in vh so the layout is identical at 960x540, 1920x1080 and 3840x2160.
-   The room: a white wall lit by daylight or a lamp, a chestnut console below it,
-   the clock standing on the console, the apps on its surface. */
+/* Paper. Sized in vh so the layout is identical at 960x540, 1920x1080 and 3840x2160.
+   White page, apps as a list of type, one warm sun on the right. */
 @font-face {
   font-family: "Bricolage";
   src: url("fonts/bricolage.woff2") format("woff2");
@@ -9,136 +8,110 @@
 }
 
 :root {
-  --wall: #fbf9f6;
+  --paper: #fdfcfa;
   --ink: #3b2218;
-  --ink-2: rgba(59, 34, 24, 0.62);
-  --wood: #5a3324;
-  --wood-deep: #43251a;
-  --wood-edge: #8a5638;
-  --cream: #f7ecdf;
-  --cream-2: rgba(247, 236, 223, 0.58);
-  --orange: #ec7330;
-  /* Set by app.js from the sun: where the light falls and what colour it is. */
-  --lx: 70%;
-  --ly: 10%;
-  --lc: rgba(255, 214, 160, 0.55);
+  --ink-2: rgba(59, 34, 24, 0.55);
+  --ink-faint: rgba(59, 34, 24, 0.24);
+  --orange: #e8702c;
+  --sun-1: #ffd9b5;
+  --sun-2: #f6c9a0;
+  --sun-3: #f0a066;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --shelf-top: 61vh;
 }
+
+/* The sun warms through the day and turns into a low, dim glow at night. app.js sets data-tod. */
+body[data-tod="morning"] { --sun-1: #fff0dc; --sun-2: #fbdcb8; --sun-3: #f5b98a; }
+body[data-tod="evening"] { --sun-1: #ffc89a; --sun-2: #f4a468; --sun-3: #e07434; }
+body[data-tod="night"]   { --paper: #f1ebe4; --sun-1: #f2b98c; --sun-2: #e5996a; --sun-3: #c9703f; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
 body {
-  background: var(--wall);
+  background: var(--paper);
   color: var(--ink);
   font-family: "Bricolage", "SamsungOne", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-variation-settings: "opsz" 14;
   -webkit-font-smoothing: antialiased;
   transition: background 3s;
   cursor: none;
 }
 button { font: inherit; color: inherit; background: none; border: 0; outline: none; }
 
-/* Light on the wall */
-.wall { position: fixed; top: 0; right: 0; bottom: 0; left: 0; }
-.light {
-  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
-  background: radial-gradient(ellipse 70vh 60vh at var(--lx) var(--ly), var(--lc), rgba(255, 255, 255, 0) 100%);
-  transition: background 3s;
+.sun {
+  position: fixed; right: -22vh; top: 12vh; width: 86vh; height: 86vh; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--sun-1) 0%, var(--sun-2) 45%, var(--sun-3) 100%);
+  opacity: 0.9;
+  transition: background 3s, opacity 3s, transform 3s var(--ease);
+  animation: rest 14s ease-in-out infinite alternate;
 }
+body[data-tod="night"] .sun { opacity: 0.55; transform: translateY(18vh) scale(0.8); animation: none; }
+@keyframes rest { to { transform: translate(-1.5vh, 1vh) scale(1.02); } }
 
 /* Top line */
-.top { position: fixed; top: 7vh; left: 9vh; right: 9vh; display: flex; justify-content: space-between; align-items: flex-start; }
-.date { font-size: 2.6vh; font-weight: 500; font-variation-settings: "opsz" 24; }
-.sun { margin-top: 0.8vh; font-size: 2.1vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.sun b { font-weight: 500; color: var(--orange); }
-
-.actions { display: flex; }
-.pill {
-  position: relative; height: 4.6vh; padding: 0 0.4vh; margin-left: 4vh;
-  font-size: 2.2vh; font-weight: 450; color: var(--ink-2);
-  transition: color 0.25s;
-}
+.bar { position: fixed; top: 8vh; left: 9vh; right: 9vh; display: flex; justify-content: space-between; align-items: center; font-size: 2.6vh; }
+.when span:first-child { font-weight: 500; }
+.date { margin-left: 3vh; color: var(--ink-2); }
+.menu { display: flex; }
+.pill { position: relative; margin-left: 3.6vh; font-weight: 500; color: var(--ink); opacity: 0.75; transition: opacity 0.25s; }
 .pill::after {
-  content: ""; position: absolute; left: 50%; bottom: 0; width: 0.8vh; height: 0.8vh; margin-left: -0.4vh;
+  content: ""; position: absolute; left: 50%; top: 100%; width: 1vh; height: 1vh; margin: 1vh 0 0 -0.5vh;
   border-radius: 50%; background: var(--orange); transform: scale(0); transition: transform 0.25s var(--ease);
 }
-.pill.focus { color: var(--ink); }
+.pill.focus { opacity: 1; }
 .pill.focus::after { transform: scale(1); }
 .pill.off { display: none; }
 
-/* The clock, standing on the console */
-.clock {
-  position: fixed; left: 7.4vh; bottom: calc(100vh - var(--shelf-top) - 3.6vh);
-  font-size: 36vh; line-height: 1; font-weight: 200; font-stretch: 80%;
-  font-variation-settings: "opsz" 96, "wght" 200, "wdth" 80; letter-spacing: -0.02em;
-  color: var(--ink);
-  transition: transform 0.6s var(--ease), opacity 0.4s;
+/* The list */
+.viewport {
+  position: fixed; left: 4.6vh; top: 18vh; bottom: 6vh; width: 110vh; overflow: hidden; padding-top: 2vh;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 2vh, #000 82%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 2vh, #000 82%, transparent 100%);
 }
-.colon { display: inline-block; color: var(--orange); animation: breathe 4s ease-in-out infinite; margin: 0 0.03em; transform: translateY(-0.06em); }
-@keyframes breathe { 50% { opacity: 0.35; } }
-.ampm { font-size: 3vh; font-weight: 500; font-stretch: 100%; letter-spacing: 0.08em; color: var(--ink-2); margin-left: 2vh; font-variation-settings: "opsz" 24; }
-
-/* The console */
-.shelf {
-  position: fixed; left: 0; right: 0; bottom: 0; top: var(--shelf-top);
-  padding: 6.4vh 9vh 0;
-  background: linear-gradient(180deg, var(--wood) 0%, var(--wood-deep) 100%);
-  box-shadow: inset 0 0.35vh 0 var(--wood-edge), 0 -2vh 6vh rgba(59, 34, 24, 0.10);
-  color: var(--cream);
-  transition: top 0.6s var(--ease);
+.list { list-style: none; padding-left: 4.4vh; transition: transform 0.5s var(--ease); }
+.item {
+  display: flex; align-items: center; white-space: nowrap;
+  color: var(--ink-faint); transition: color 0.25s;
 }
-.shelf-head { display: flex; justify-content: space-between; align-items: flex-start; }
-.dock { display: flex; }
-.dock .tile + .tile { margin-left: 2.6vh; }
-
-.tile {
-  position: relative; width: 26vh; height: 14.6vh; border-radius: 1.6vh; overflow: hidden; flex: none;
-  background: rgba(247, 236, 223, 0.07); box-shadow: inset 0 0 0 1px rgba(247, 236, 223, 0.08);
-  display: flex; align-items: center; justify-content: center;
-  transition: transform 0.35s var(--ease), box-shadow 0.35s, background 0.35s;
+.item::before {
+  content: ""; flex: none; border-radius: 50%; background: var(--orange);
+  transform: scale(0); transition: transform 0.3s var(--ease);
 }
-.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tile .name { font-size: 2.8vh; font-weight: 500; font-stretch: 88%; color: var(--cream); font-variation-settings: "opsz" 28; }
-.tile.missing { opacity: 0.4; }
-.tile .glyph { width: 6.4vh; height: 6.4vh; color: var(--cream-2); transition: color 0.35s; }
-/* Focus: the tile lifts off the wood and lamplight pools under it. */
-.tile.focus {
-  transform: translateY(-1.4vh) scale(1.05);
-  background: rgba(247, 236, 223, 0.16);
-  box-shadow: inset 0 0 0 0.3vh var(--cream), 0 3.6vh 5vh -1.6vh rgba(236, 115, 48, 0.55);
+.item.focus { color: var(--ink); }
+.item.focus::before { transform: scale(1); }
+.big {
+  font-size: 10.5vh; line-height: 1.12; font-weight: 300; font-stretch: 80%; letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 96, "wdth" 80;
+  margin-left: -4.4vh;
 }
-.tile.focus .glyph { color: var(--orange); }
+.big::before { width: 2.2vh; height: 2.2vh; margin-right: 2.2vh; }
+.big.focus { font-weight: 500; font-variation-settings: "opsz" 96, "wdth" 80, "wght" 500; }
+.big .sub { font-size: 2.4vh; font-weight: 400; font-stretch: 100%; letter-spacing: 0; color: var(--ink-2); margin-left: 2.4vh; opacity: 0; transition: opacity 0.3s; font-variation-settings: "opsz" 14; }
+.big.focus .sub { opacity: 1; }
+.big.missing { text-decoration: line-through; text-decoration-thickness: 0.15vh; }
+.label { font-size: 2.2vh; font-weight: 500; color: var(--ink-2); margin: 5vh 0 2vh; }
+.small {
+  font-size: 5vh; line-height: 1.3; font-weight: 300; font-stretch: 85%;
+  font-variation-settings: "opsz" 48, "wdth" 85;
+  margin-left: -3.4vh;
+}
+.small::before { width: 1.4vh; height: 1.4vh; margin-right: 2vh; }
+.small.focus { font-weight: 500; font-variation-settings: "opsz" 48, "wdth" 85, "wght" 500; }
 
-.dock-label { height: 3vh; margin-top: 2.6vh; font-size: 2.3vh; font-weight: 500; color: var(--cream); white-space: nowrap; transition: transform 0.35s var(--ease); }
-.dock-label .sub { color: var(--cream-2); font-weight: 400; margin-left: 1.4vh; }
 
-.hint { display: flex; align-items: center; height: 14.6vh; font-size: 1.9vh; font-weight: 500; color: var(--cream-2); white-space: nowrap; }
-.chev { width: 1.2vh; height: 1.2vh; margin-left: 1.4vh; border-right: 0.22vh solid var(--orange); border-bottom: 0.22vh solid var(--orange); transform: rotate(45deg); animation: nudge 2.4s ease-in-out infinite; }
-@keyframes nudge { 50% { transform: translate(0, 0.5vh) rotate(45deg); } }
-
-/* All apps: the console rises and the rest of the apps sit on it. */
-body.drawer-open { --shelf-top: 18vh; }
-body.drawer-open .clock { opacity: 0; transform: translateY(-20vh); }
-body.drawer-open .hint { opacity: 0; }
-.drawer { margin-top: 0.6vh; padding-top: 3.4vh; border-top: 1px solid rgba(247, 236, 223, 0.12); opacity: 0; transition: opacity 0.4s; }
-body.drawer-open .drawer { opacity: 1; }
-.grid { display: grid; grid-template-columns: repeat(6, 1fr); grid-gap: 3vh 2.6vh; height: 46vh; padding: 1.6vh 0.6vh; margin: -1.6vh -0.6vh; overflow: hidden; align-content: start; }
-.grid .tile { width: 100%; height: 13.4vh; }
-.grid .tile .name { font-size: 2.2vh; padding: 0 1.4vh; text-align: center; }
-
-/* Sheet: a card on the wall */
-.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; background: rgba(59, 34, 24, 0.28); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+/* Sheet: inputs list, cast card */
+.sheet { position: fixed; top: 0; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: flex-start; padding-left: 9vh; background: rgba(253, 252, 250, 0.86); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
 body.sheet-open .sheet { opacity: 1; }
-.sheet-card { width: 74vh; padding: 5.4vh; border-radius: 2.4vh; background: var(--wall); color: var(--ink); box-shadow: 0 4vh 10vh rgba(59, 34, 24, 0.3); transform: translateY(2vh); transition: transform 0.35s var(--ease); }
+.viewport { transition: opacity 0.3s; }
+body.sheet-open .viewport { opacity: 0; }
+.sheet-card { width: 82vh; transform: translateY(2vh); transition: transform 0.35s var(--ease); }
 body.sheet-open .sheet-card { transform: translateY(0); }
-.sheet-title { font-size: 4.4vh; font-weight: 400; font-stretch: 85%; font-variation-settings: "opsz" 60; letter-spacing: -0.01em; margin-bottom: 1.6vh; }
-.sheet-body { font-size: 2.2vh; line-height: 1.6; color: var(--ink-2); }
+.sheet-title { font-size: 8vh; font-weight: 400; font-stretch: 80%; letter-spacing: -0.02em; font-variation-settings: "opsz" 96, "wdth" 80; margin-bottom: 2vh; }
+.sheet-body { font-size: 2.6vh; line-height: 1.6; color: var(--ink-2); max-width: 70vh; }
 .sheet-body b { color: var(--ink); font-weight: 600; }
-.sheet-list { margin-top: 2.6vh; }
-.sheet-list .row + .row { margin-top: 0.8vh; }
-.row { height: 6.4vh; padding: 0 2.4vh; border-radius: 1.2vh; display: flex; align-items: center; font-size: 2.4vh; font-weight: 500; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
-.row.focus { background: var(--wood); color: var(--cream); }
+.sheet-list { margin-top: 3vh; }
+.row { display: flex; align-items: center; font-size: 4.4vh; line-height: 1.5; font-weight: 300; font-stretch: 85%; color: var(--ink-faint); margin-left: -3.4vh; font-variation-settings: "opsz" 48, "wdth" 85; }
+.row::before { content: ""; width: 1.4vh; height: 1.4vh; margin-right: 2vh; border-radius: 50%; background: var(--orange); transform: scale(0); transition: transform 0.3s var(--ease); }
+.row.focus { color: var(--ink); font-weight: 500; font-variation-settings: "opsz" 48, "wdth" 85, "wght" 500; }
+.row.focus::before { transform: scale(1); }
 
 /* Samsung: the HDMI picture shows through a transparent page. */
-body.passthrough, body.passthrough .wall, body.passthrough .top, body.passthrough .clock, body.passthrough .shelf, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }
+body.passthrough, body.passthrough .sun, body.passthrough .bar, body.passthrough .viewport, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }
