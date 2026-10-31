@@ -113,5 +113,48 @@ body.sheet-open .sheet-card { transform: translateY(0); }
 .row.focus { color: var(--ink); font-weight: 500; font-variation-settings: "opsz" 48, "wdth" 85, "wght" 500; }
 .row.focus::before { transform: scale(1); }
 
+/* ---------- Gameday: navy, silver and white ---------- */
+.star, .game, .slate, .intro-video { display: none; }
+body.gameday {
+  --paper: #041e42;
+  --ink: #ffffff;
+  --ink-2: rgba(255, 255, 255, 0.62);
+  --ink-faint: rgba(255, 255, 255, 0.34);
+  --orange: #c4ccd2;
+  --silver: #a7b1b8;
+  background: radial-gradient(ellipse 120vh 90vh at 20% 0%, #0a2f63 0%, #041e42 55%, #021430 100%);
+}
+body.gameday .sun { display: none; }
+body.gameday .star { display: block; position: fixed; right: -14vh; bottom: -26vh; width: 104vh; height: 104vh; opacity: 0.16; }
+body.gameday .game { display: block; position: fixed; left: 9vh; top: 17vh; width: 92vh; }
+.g-eyebrow { font-size: 2vh; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silver); }
+.g-title { margin-top: 1.2vh; font-size: 9vh; line-height: 1; font-weight: 600; font-stretch: 78%; letter-spacing: -0.015em; font-variation-settings: "opsz" 96, "wdth" 78, "wght" 600; }
+.g-meta { margin-top: 2vh; font-size: 2.8vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.g-meta b { color: var(--ink); font-weight: 600; }
+.g-meta i { display: inline-block; width: 0.7vh; height: 0.7vh; margin: 0 1.6vh 0.5vh; border-radius: 50%; background: var(--silver); }
+body.gameday .viewport { top: 42vh; }
+body.gameday .big { font-stretch: 85%; letter-spacing: -0.01em; }
+body.gameday .item::before { border-radius: 0; clip-path: polygon(50% 0, 61.8% 34.5%, 97.6% 34.5%, 68.6% 56.6%, 79.4% 91%, 50% 70%, 20.6% 91%, 31.4% 56.6%, 2.4% 34.5%, 38.2% 34.5%); background: #ffffff; }
+body.gameday .label { color: var(--ink-faint); }
+
+body.gameday .slate { display: block; position: fixed; right: 9vh; top: 17vh; bottom: 8vh; width: 60vh; }
+.slate-title { font-size: 2vh; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--silver); margin-bottom: 1.6vh; }
+.slate-list { list-style: none; }
+.g { display: flex; align-items: center; height: 5.4vh; padding: 0 2vh; border-radius: 1vh; font-size: 2.5vh; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.g + .g { border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.g .t { width: 14vh; color: var(--ink-faint); }
+.g .t b { color: #ffffff; font-weight: 600; }
+.g .m { flex: 1; font-weight: 500; color: var(--ink); letter-spacing: 0.02em; }
+.g .m i { font-style: normal; color: var(--ink-faint); margin: 0 0.6vh; font-weight: 400; }
+.g .n { color: var(--ink-faint); }
+.g.mine { background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)); border-top-color: transparent; }
+.g.mine + .g { border-top-color: transparent; }
+.g.mine .t, .g.mine .n { color: var(--ink); }
+.g.empty { color: var(--ink-faint); }
+body.gameday .sheet { background: rgba(4, 30, 66, 0.92); }
+
+/* Gameday intro video, full screen over everything. */
+body.intro .intro-video { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; background: #000; z-index: 10; }
+
 /* Samsung: the HDMI picture shows through a transparent page. */
-body.passthrough, body.passthrough .sun, body.passthrough .bar, body.passthrough .viewport, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }
+body.passthrough, body.passthrough .sun, body.passthrough .star, body.passthrough .game, body.passthrough .slate, body.passthrough .bar, body.passthrough .viewport, body.passthrough .sheet { background: transparent !important; opacity: 0 !important; }

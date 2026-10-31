@@ -28,6 +28,109 @@
     $('time').textContent = cfg.clock12h ? (h % 12 || 12) + ':' + m + (h < 12 ? ' AM' : ' PM') : h + ':' + m;
     $('date').textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     ROOT.dataset.tod = window.TOD_OVERRIDE || partOfDay(h);
+    if (cfg.gameday) {
+      if (cfg.gameday.months.indexOf(d.getMonth() + 1) >= 0 || gd.on) loadGames(d);
+      const on = isGameday(d);
+      if (on !== gd.on) { gd.on = on; ROOT.classList.toggle('gameday', on); paintGame(); refresh(); if (on) playIntro(); }
+    }
+  }
+
+  // ---------- Gameday (Samsung, NFL Sundays) ----------
+  const gd = { on: false, games: [], week: null, loaded: 0, day: '' };
+
+  function isGameday(d) {
+    const g = cfg.gameday;
+    if (!g) return false;
+    const kind = host.kind === 'demo' ? (window.PREVIEW_TV || 'tizen') : host.kind;
+    if (g.tvs.indexOf(kind) < 0) return false;
+    if (window.GAMEDAY_OVERRIDE !== undefined && window.GAMEDAY_OVERRIDE !== null) return window.GAMEDAY_OVERRIDE;
+    const inSeason = g.months.indexOf(d.getMonth() + 1) >= 0;
+    const teamPlays = gd.games.some((x) => x.mine && sameDay(x.start, d));
+    return inSeason && ((g.days.indexOf(d.getDay()) >= 0 && d.getHours() >= g.fromHour) || teamPlays);
+  }
+
+  const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const ymd = (d) => d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+
+  // ESPN's public scoreboard: every game that day with kickoff, network, score and status.
+  function loadGames(d) {
+    const day = ymd(d);
+    if (gd.day === day && Date.now() - gd.loaded < (gd.on ? 60000 : 1800000)) return;
+    gd.day = day; gd.loaded = Date.now();
+    const got = host.schedule ? host.schedule(d)
+      : fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=' + day).then((r) => r.json()).then(parseEspn);
+    got.then((res) => { gd.games = res.games; gd.week = res.week; paintGame(); refresh(); })
+      .catch(() => { gd.games = []; paintGame(); });
+  }
+
+  function parseEspn(data) {
+    const team = cfg.gameday.team;
+    const games = (data.events || []).map((e) => {
+      const c = e.competitions[0];
+      const side = (h) => {
+        const t = c.competitors.find((x) => x.homeAway === h);
+        return { abbr: t.team.abbreviation, name: t.team.shortDisplayName, score: t.score };
+      };
+      const home = side('home'), away = side('away');
+      const b = (c.broadcasts || [])[0];
+      return {
+        start: new Date(e.date), home, away,
+        network: b && b.names ? b.names[0] : '',
+        state: c.status.type.state, detail: c.status.type.shortDetail,
+        venue: c.venue ? c.venue.fullName : '',
+        mine: home.abbr === team || away.abbr === team
+      };
+    });
+    return { games, week: data.week ? data.week.number : null };
+  }
+
+  function kickoff(d) {
+    const h = d.getHours(), m = String(d.getMinutes()).padStart(2, '0');
+    if (h === 12 && m === '00') return 'Noon';
+    return cfg.clock12h ? (h % 12 || 12) + ':' + m + (h < 12 ? ' AM' : ' PM') : h + ':' + m;
+  }
+
+  function myGame() { return gd.games.find((x) => x.mine); }
+
+  function paintGame() {
+    const g = myGame();
+    const team = cfg.gameday.team;
+    $('gEyebrow').textContent = 'Gameday' + (gd.week ? '  ·  Week ' + gd.week : '');
+    if (!g) {
+      $('gTitle').textContent = cfg.gameday.teamName;
+      $('gMeta').textContent = gd.games.length ? 'No game today' : 'Loading the schedule';
+    } else {
+      const me = g.home.abbr === team ? g.home : g.away;
+      const them = g.home.abbr === team ? g.away : g.home;
+      $('gTitle').textContent = me.name + (g.home.abbr === team ? ' vs ' : ' at ') + them.name;
+      if (g.state === 'pre') $('gMeta').innerHTML = esc(kickoff(g.start)) + '<i></i>' + esc(g.network) + '<i></i>' + esc(g.venue);
+      else $('gMeta').innerHTML = '<b>' + esc(me.abbr + ' ' + me.score + '  ' + them.abbr + ' ' + them.score) + '</b><i></i>' + esc(g.detail) + '<i></i>' + esc(g.network);
+    }
+    const rows = gd.games.slice().sort((a, b) => a.start - b.start).map((x) => {
+      const right = x.state === 'pre' ? esc(x.network) : esc(x.away.score + ' - ' + x.home.score);
+      const left = x.state === 'pre' ? esc(kickoff(x.start)) : (x.state === 'in' ? '<b>Live</b>' : 'Final');
+      return '<li class="g' + (x.mine ? ' mine' : '') + (x.state === 'in' ? ' live' : '') + '"><span class="t">' + left +
+        '</span><span class="m">' + esc(x.away.abbr) + ' <i>at</i> ' + esc(x.home.abbr) + '</span><span class="n">' + right + '</span></li>';
+    });
+    const first = gd.games[0];
+    $('slateTitle').textContent = first ? first.start.toLocaleDateString('en-US', { weekday: 'long' }) + "'s games" : "Today's games";
+    $('gList').innerHTML = rows.join('') || '<li class="g empty">Schedule loads when the TV is online</li>';
+  }
+
+  // The gameday intro plays once each time the homescreen opens. Any button skips it.
+  let introPlayed = false;
+  function playIntro() {
+    const v = $('intro');
+    if (introPlayed || !cfg.gameday.intro || !v) return;
+    introPlayed = true;
+    const done = () => { ROOT.classList.remove('intro'); v.pause(); v.removeAttribute('src'); v.load(); };
+    v.onended = done;
+    v.onerror = done;
+    v.src = cfg.gameday.intro;
+    ROOT.classList.add('intro');
+    const p = v.play();
+    if (p && p.catch) p.catch(done);
+    window.skipIntro = done;
   }
 
   // ---------- Apps ----------
@@ -61,11 +164,17 @@
       if (item.type === 'cast') sub = 'Cast from your phone';
       else if (item.type === 'input') sub = savedPort(item) ? savedPort(item).name + '. Right to change' : 'Pick its HDMI port';
       else if (!app) sub = 'Not installed';
-      return { kind: 'dock', item, app, name: item.name, sub };
+      let name = item.name;
+      if (gd.on && item.key === cfg.gameday.watch) {
+        const g = myGame();
+        name = 'Watch the game';
+        sub = item.name + (g && g.network ? '. Find ' + g.network : '');
+      }
+      return { kind: 'dock', item, app, name, sub };
     });
     state.dockLen = dock.length;
     // More lines, smaller type, so the dock always fits the page.
-    ROOT.style.setProperty('--big', Math.min(10.5, 64 / (dock.length * 1.12)).toFixed(2));
+    ROOT.style.setProperty('--big', Math.min(gd.on ? 5.6 : 10.5, (gd.on ? 46 : 64) / (dock.length * 1.12)).toFixed(2));
     const hidden = (a) => cfg.hidden.some((re) => re.test(a.id) || re.test(a.name));
     const rest = apps.filter((a) => !used[a.id] && !hidden(a))
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -225,6 +334,7 @@
 
   document.addEventListener('keydown', (e) => {
     const k = e.keyCode;
+    if (ROOT.classList.contains('intro')) { e.preventDefault(); return window.skipIntro(); }
     if (k >= 37 && k <= 40) { e.preventDefault(); move(k); }
     else if (k === KEY.ENTER) { e.preventDefault(); activate(); }
     else if (BACK_KEYS.indexOf(k) >= 0) { e.preventDefault(); back(); }
@@ -243,5 +353,6 @@
   state.i = Number(store.get('dock')) || 0;
   tick();
   setInterval(tick, 5000);
+  window.tvGameday = tick;
   refresh();
 })();

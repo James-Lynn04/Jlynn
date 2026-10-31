@@ -8,6 +8,11 @@
 </head>
 <body>
   <div class="sun" aria-hidden="true"></div>
+  <!-- Gameday backdrop: a large silver star. -->
+  <svg class="star" viewBox="0 0 100 100" aria-hidden="true">
+    <defs><linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9edf0"/><stop offset="0.55" stop-color="#9aa5ad"/><stop offset="1" stop-color="#5d6a74"/></linearGradient></defs>
+    <polygon points="50,4 61.8,38.2 97.6,38.2 68.6,59.4 79.4,93.6 50,72.4 20.6,93.6 31.4,59.4 2.4,38.2 38.2,38.2" fill="url(#silver)"/>
+  </svg>
 
   <header class="bar">
     <div class="when"><span id="time"></span><span id="date" class="date"></span></div>
@@ -16,6 +21,17 @@
       <button class="pill" data-zone="top" data-action="settings" id="settingsBtn">Settings</button>
     </nav>
   </header>
+
+  <!-- Gameday: your team's game and the day's schedule. -->
+  <section class="game" aria-live="polite">
+    <div id="gEyebrow" class="g-eyebrow"></div>
+    <div id="gTitle" class="g-title"></div>
+    <div id="gMeta" class="g-meta"></div>
+  </section>
+  <section class="slate">
+    <div id="slateTitle" class="slate-title">Today's games</div>
+    <ul id="gList" class="slate-list"></ul>
+  </section>
 
   <!-- Every app as a line of type. The dock comes first in large type, then all other apps. -->
   <div class="viewport"><ul id="list" class="list"></ul></div>
@@ -27,6 +43,8 @@
       <div id="sheetList" class="sheet-list"></div>
     </div>
   </section>
+
+  <video id="intro" class="intro-video" playsinline muted></video>
 
   <script src="config.js"></script>
   <script src="hosts.js"></script>

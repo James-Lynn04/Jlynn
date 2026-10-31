@@ -94,6 +94,19 @@ function demoHost() {
     settings: () => sheet('Settings', 'On the TV this opens system settings.'),
     deviceName: () => 'Living Room TV',
     storeFor: (item) => ({ title: item.name + ' is not installed', body: 'On the TV this opens the store.' }),
+    // Four of the November 1, 2026 games, for the preview only. The TV loads every game from ESPN.
+    schedule: () => {
+      const g = (utc, away, home, network, venue, mine) => ({
+        start: new Date(utc), state: 'pre', detail: '', network, venue, mine: !!mine,
+        away: { abbr: away[0], name: away[1], score: '0' }, home: { abbr: home[0], name: home[1], score: '0' }
+      });
+      return Promise.resolve({ week: 8, games: [
+        g('2026-11-01T18:00:00Z', ['ARI', 'Cardinals'], ['DAL', 'Cowboys'], 'FOX', 'AT&T Stadium', true),
+        g('2026-11-01T18:00:00Z', ['BAL', 'Ravens'], ['BUF', 'Bills'], 'CBS', 'Highmark Stadium'),
+        g('2026-11-01T21:25:00Z', ['NE', 'Patriots'], ['MIA', 'Dolphins'], 'CBS', 'Hard Rock Stadium'),
+        g('2026-11-02T01:20:00Z', ['PHI', 'Eagles'], ['WSH', 'Commanders'], 'NBC', 'Northwest Stadium')
+      ] });
+    },
     back: () => false
   };
 }

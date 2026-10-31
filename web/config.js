@@ -19,6 +19,19 @@ window.HOME_CONFIG = {
     { key: 'xbox', name: 'Xbox', type: 'input', device: 'Xbox', tvs: ['tizen'] }
   ],
 
+  // NFL Sundays on the Samsung: the page turns navy and silver, shows your team's game and the day's schedule,
+  // and the Live TV line becomes "Watch the game". Live scores come from ESPN when the TV is online.
+  gameday: {
+    team: 'DAL',              // ESPN team code
+    teamName: 'Dallas Cowboys',
+    watch: 'livetv',          // dock line that opens the game
+    days: [0],                // 0 = Sunday. Also on any day the team plays.
+    fromHour: 8,
+    months: [9, 10, 11, 12, 1, 2],
+    tvs: ['tizen'],
+    intro: 'intro.mp4'        // optional video in web/, plays once when the homescreen opens on gameday
+  },
+
   // Apps never shown in the All apps drawer (Android package names or Samsung app names).
   hidden: [/^com\.google\.android\.tungsten/, /^io\.jlynn\.tvhome/]
 };
